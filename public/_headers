@@ -1,0 +1,4 @@
+/*
+  Cross-Origin-Embedder-Policy: credentialless
+  Cross-Origin-Resource-Policy: cross-origin
+  Content-Security-Policy: frame-ancestors *

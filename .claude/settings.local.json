@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node test-usernames.js)",
+      "Bash(xargs grep *)",
+      "Bash(pnpm install *)",
+      "Bash(npx tsc *)",
+      "mcp__claude_ai_ReplykeDocs__search_replyke_documentation",
+      "WebSearch"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
