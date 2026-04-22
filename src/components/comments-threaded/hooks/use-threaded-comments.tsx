@@ -9,6 +9,15 @@ import CommentMenuModal from "../components/modals/comment-menu-modal/comment-me
 import CommentMenuModalOwner from "../components/modals/comment-menu-modal-owner/comment-menu-modal-owner";
 import { UIStateProvider } from "../context/ui-state-context";
 
+export type ThreadedCommentCallbacks = {
+  loginRequiredCallback: () => void;
+  usernameRequiredCallback: () => void;
+  commentTooShortCallback: () => void;
+  userCantBeMentionedCallback: () => void;
+  currentUserClickCallback: () => void;
+  otherUserClickCallback: (userId: string, foreignId: string | undefined) => void;
+};
+
 function useThreadedComments({
   entity,
   entityId,
@@ -16,6 +25,7 @@ function useThreadedComments({
   shortId,
   createIfNotFound,
   highlightedCommentId,
+  callbacks: callbackOverrides,
 }: {
   entity?: Entity | undefined | null;
   entityId?: string | undefined | null;
@@ -23,6 +33,7 @@ function useThreadedComments({
   shortId?: string | undefined | null;
   createIfNotFound?: boolean;
   highlightedCommentId?: string | null;
+  callbacks?: Partial<ThreadedCommentCallbacks>;
 }) {
 
   // 🔧 CUSTOMIZE: Callback handlers for user interactions
@@ -73,8 +84,10 @@ function useThreadedComments({
         // Example: router.push(`/users/${userId}`)
         console.log(`Navigate to user ${userId} profile`, { foreignId });
       },
+
+      ...callbackOverrides,
     }),
-    []
+    [callbackOverrides]
   );
   const MemoizedCommentSectionProvider = useMemo(() => {
     return ({ children }: { children: ReactNode }) => (

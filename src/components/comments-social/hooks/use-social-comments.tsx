@@ -9,6 +9,14 @@ import CommentMenuModal from "../components/modals/comment-menu-modal/comment-me
 import CommentMenuModalOwner from "../components/modals/comment-menu-modal-owner/comment-menu-modal-owner";
 import { UIStateProvider } from "../context/ui-state-context";
 
+export type SocialCommentCallbacks = {
+  loginRequiredCallback: () => void;
+  usernameRequiredCallback: () => void;
+  userCantBeMentionedCallback: () => void;
+  currentUserClickCallback: () => void;
+  otherUserClickCallback: (userId: string, foreignId: string | undefined) => void;
+};
+
 function useSocialComments({
   entity,
   entityId,
@@ -16,6 +24,7 @@ function useSocialComments({
   shortId,
   createIfNotFound,
   highlightedCommentId,
+  callbacks: callbackOverrides,
 }: {
   entity?: Entity | undefined | null;
   entityId?: string | undefined | null;
@@ -23,6 +32,7 @@ function useSocialComments({
   shortId?: string | undefined | null;
   createIfNotFound?: boolean;
   highlightedCommentId?: string | null;
+  callbacks?: Partial<SocialCommentCallbacks>;
 }) {
 
   // 🔧 CUSTOMIZE: Callback handlers for user interactions
@@ -63,7 +73,9 @@ function useSocialComments({
       // Example: router.push(`/users/${userId}`)
       console.log(`Navigate to user ${userId} profile`, { foreignId });
     },
-  }), []);
+
+    ...callbackOverrides,
+  }), [callbackOverrides]);
   const MemoizedCommentSectionProvider = useMemo(() => {
     return ({ children }: { children: ReactNode }) => (
       <CommentSectionProvider

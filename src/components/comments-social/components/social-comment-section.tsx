@@ -54,7 +54,7 @@
  */
 import React from "react";
 import { Entity } from "@replyke/react-js";
-import useSocialComments from "../hooks/use-social-comments";
+import useSocialComments, { SocialCommentCallbacks } from "../hooks/use-social-comments";
 import { SortByButton } from "./sort-by-button";
 import CommentsFeed from "./comments-feed/comments-feed";
 import NewCommentForm from "./new-comment-form";
@@ -67,6 +67,7 @@ interface SocialCommentSectionProps {
   shortId?: string | undefined | null;
   isVisible?: boolean;
   highlightedCommentId?: string | undefined | null;
+  callbacks?: Partial<SocialCommentCallbacks>;
   children?: React.ReactNode;
 }
 
@@ -86,7 +87,8 @@ const arePropsEqual = (
     prevProps.foreignId !== nextProps.foreignId ||
     prevProps.shortId !== nextProps.shortId ||
     prevProps.isVisible !== nextProps.isVisible ||
-    prevProps.highlightedCommentId !== nextProps.highlightedCommentId
+    prevProps.highlightedCommentId !== nextProps.highlightedCommentId ||
+    prevProps.callbacks !== nextProps.callbacks
   ) {
     return false;
   }
@@ -177,6 +179,7 @@ function SocialCommentSection({
   shortId,
   isVisible = true,
   highlightedCommentId,
+  callbacks,
   children,
 }: SocialCommentSectionProps) {
   const { CommentSectionProvider } = useSocialComments({
@@ -185,6 +188,7 @@ function SocialCommentSection({
     foreignId,
     shortId,
     highlightedCommentId,
+    callbacks,
   });
 
   return (

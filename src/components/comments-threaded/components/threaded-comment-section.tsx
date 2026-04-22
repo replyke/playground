@@ -51,7 +51,7 @@
  */
 import React from "react";
 import { Entity } from "@replyke/react-js";
-import useThreadedComments from "../hooks/use-threaded-comments";
+import useThreadedComments, { ThreadedCommentCallbacks } from "../hooks/use-threaded-comments";
 import CommentsFeed from "./comments-feed/comments-feed";
 import NewCommentForm from "./new-comment-form";
 import { deepEqual, warnPropChanges } from "../utils/prop-comparison";
@@ -63,6 +63,7 @@ interface ThreadedCommentSectionProps {
   shortId?: string | undefined | null;
   isVisible?: boolean;
   highlightedCommentId?: string | undefined | null;
+  callbacks?: Partial<ThreadedCommentCallbacks>;
   children?: React.ReactNode;
 }
 
@@ -82,7 +83,8 @@ const arePropsEqual = (
     prevProps.foreignId !== nextProps.foreignId ||
     prevProps.shortId !== nextProps.shortId ||
     prevProps.isVisible !== nextProps.isVisible ||
-    prevProps.highlightedCommentId !== nextProps.highlightedCommentId
+    prevProps.highlightedCommentId !== nextProps.highlightedCommentId ||
+    prevProps.callbacks !== nextProps.callbacks
   ) {
     return false;
   }
@@ -137,6 +139,7 @@ function ThreadedCommentSection({
   shortId,
   isVisible = true,
   highlightedCommentId,
+  callbacks,
   children,
 }: ThreadedCommentSectionProps) {
   const { CommentSectionProvider } = useThreadedComments({
@@ -145,6 +148,7 @@ function ThreadedCommentSection({
     foreignId,
     shortId,
     highlightedCommentId,
+    callbacks,
   });
 
   return (
