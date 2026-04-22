@@ -19,7 +19,16 @@ import CollectionsDialog from "./collections-dialog";
 import ReportDialog from "./report-dialog";
 import { Dialog } from "./ui/dialog";
 
-const REACTION_TYPES = ["upvote", "downvote", "like", "love", "wow", "sad", "angry", "funny"] as const;
+const REACTION_TYPES = [
+  "upvote",
+  "downvote",
+  "like",
+  "love",
+  "wow",
+  "sad",
+  "angry",
+  "funny",
+] as const;
 type ReactionType = (typeof REACTION_TYPES)[number];
 
 const REACTION_EMOJIS: Record<ReactionType, string> = {
@@ -51,25 +60,28 @@ interface TweetProps {
   handleSelectEntity: (entity: unknown) => void;
 }
 
-export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps) {
+export default function Tweet({
+  onAuthRequired,
+  handleSelectEntity,
+}: TweetProps) {
   const { user } = useUser();
   const { entity } = useEntity();
 
-  const {
-    currentReaction,
-    reactionCounts,
-    toggleReaction,
-  } = useReactionToggle({
-    targetType: "entity",
-    targetId: entity?.id,
-    initialReaction: entity?.userReaction,
-    initialReactionCounts: entity?.reactionCounts,
-  });
+  const { currentReaction, reactionCounts, toggleReaction } = useReactionToggle(
+    {
+      targetType: "entity",
+      targetId: entity?.id,
+      initialReaction: entity?.userReaction,
+      initialReactionCounts: entity?.reactionCounts,
+    },
+  );
 
   const isAuthor = user?.id === entity?.user?.id;
   const { deleteEntity } = useEntityList({ listId: "home-tweets" });
 
-  const [isEntitySaved, setIsEntitySaved] = useState<boolean>(entity?.isSaved ?? false);
+  const [isEntitySaved, setIsEntitySaved] = useState<boolean>(
+    entity?.isSaved ?? false,
+  );
   const [showDropdown, setShowDropdown] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isBookmarkDrawerOpen, setIsBookmarkDrawerOpen] = useState(false);
@@ -81,11 +93,17 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pickerHoverRef = useRef(false);
 
-  const totalReactions = Object.values(reactionCounts ?? {}).reduce((sum, n) => sum + (n ?? 0), 0);
+  const totalReactions = Object.values(reactionCounts ?? {}).reduce(
+    (sum, n) => sum + (n ?? 0),
+    0,
+  );
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setShowDropdown(false);
       }
     };
@@ -101,17 +119,28 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
   };
 
   const handleBookmarkClick = () => {
-    if (!user) { onAuthRequired(); return; }
+    if (!user) {
+      onAuthRequired();
+      return;
+    }
     setIsBookmarkDrawerOpen(true);
   };
 
   const handleReactionClick = () => {
-    if (!user) { onAuthRequired(); return; }
-    toggleReaction({ reactionType: (currentReaction as ReactionType) ?? "like" });
+    if (!user) {
+      onAuthRequired();
+      return;
+    }
+    toggleReaction({
+      reactionType: (currentReaction as ReactionType) ?? "like",
+    });
   };
 
   const handleReactionSelect = (type: ReactionType) => {
-    if (!user) { onAuthRequired(); return; }
+    if (!user) {
+      onAuthRequired();
+      return;
+    }
     toggleReaction({ reactionType: type });
     setShowReactionPicker(false);
   };
@@ -136,7 +165,7 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
   return (
     <div className="px-4 py-3.5 hover:bg-neutral-50/70 transition-colors duration-150">
       <div className="flex gap-3">
-        <UserHoverCard user={entity?.user as Record<string, unknown> || {}}>
+        <UserHoverCard user={(entity?.user as Record<string, unknown>) || {}}>
           <Link
             to={"/u/" + (entity?.user?.id || "")}
             className="hover:opacity-80 transition-opacity shrink-0"
@@ -151,7 +180,9 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2">
-              <UserHoverCard user={entity?.user as Record<string, unknown> || {}}>
+              <UserHoverCard
+                user={(entity?.user as Record<string, unknown>) || {}}
+              >
                 <Link
                   to={"/u/" + (entity?.user?.id || "")}
                   className="font-semibold text-neutral-900 text-sm hover:underline leading-tight"
@@ -176,14 +207,20 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
                 <div className="absolute right-0 top-8 bg-white border border-neutral-200 rounded-xl shadow-lg py-1.5 z-10 min-w-36 overflow-hidden">
                   {isAuthor ? (
                     <button
-                      onClick={() => { setShowDropdown(false); setShowDeleteConfirm(true); }}
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setShowDeleteConfirm(true);
+                      }}
                       className="w-full text-left px-3.5 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                     >
                       Delete post
                     </button>
                   ) : (
                     <button
-                      onClick={() => { setShowDropdown(false); setShowReportDialog(true); }}
+                      onClick={() => {
+                        setShowDropdown(false);
+                        setShowReportDialog(true);
+                      }}
                       className="w-full text-left px-3.5 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
                     >
                       Report post
@@ -194,7 +231,9 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
             </div>
           </div>
 
-          <p className="text-neutral-800 text-sm leading-relaxed mb-2.5">{entity?.content}</p>
+          <p className="text-neutral-800 text-sm leading-relaxed mb-2.5">
+            {entity?.content}
+          </p>
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-5">
@@ -212,21 +251,36 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
                   onTouchMove={handleTouchEnd}
                   className={
                     "flex items-center gap-1.5 transition-colors group cursor-pointer " +
-                    (currentReaction ? "text-rose-500" : "text-neutral-400 hover:text-rose-500")
+                    (currentReaction
+                      ? "text-rose-500"
+                      : "text-neutral-400 hover:text-rose-500")
                   }
                 >
-                  <div className={"p-1.5 rounded-full transition-colors text-base leading-none " + (currentReaction ? "bg-rose-50" : "group-hover:bg-rose-50")}>
-                    {currentReaction
-                      ? REACTION_EMOJIS[currentReaction as ReactionType]
-                      : <SmilePlus size={14} />}
+                  <div
+                    className={
+                      "p-1.5 rounded-full transition-colors text-base leading-none " +
+                      (currentReaction
+                        ? "bg-rose-50"
+                        : "group-hover:bg-rose-50")
+                    }
+                  >
+                    {currentReaction ? (
+                      REACTION_EMOJIS[currentReaction as ReactionType]
+                    ) : (
+                      <SmilePlus size={14} />
+                    )}
                   </div>
-                  <span className="text-xs font-medium">{totalReactions > 0 ? totalReactions : ""}</span>
+                  <span className="text-xs font-medium">
+                    {totalReactions > 0 ? totalReactions : ""}
+                  </span>
                 </button>
 
                 {showReactionPicker && (
                   <div
                     className="absolute bottom-full left-0 mb-2 flex items-center gap-0.5 bg-white border border-neutral-200 rounded-full shadow-xl px-2 py-1.5 z-20"
-                    onMouseEnter={() => { pickerHoverRef.current = true; }}
+                    onMouseEnter={() => {
+                      pickerHoverRef.current = true;
+                    }}
                     onMouseLeave={() => {
                       pickerHoverRef.current = false;
                       setShowReactionPicker(false);
@@ -239,7 +293,9 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
                         title={type}
                         className={
                           "text-lg p-1 rounded-full transition-all hover:scale-125 hover:bg-neutral-100 " +
-                          (currentReaction === type ? "scale-110 bg-neutral-100" : "")
+                          (currentReaction === type
+                            ? "scale-110 bg-neutral-100"
+                            : "")
                         }
                       >
                         {REACTION_EMOJIS[type]}
@@ -256,7 +312,9 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
                 <div className="p-1.5 rounded-full group-hover:bg-emerald-50 transition-colors">
                   <MessageCircle size={14} />
                 </div>
-                <span className="text-xs font-medium">{entity?.repliesCount || ""}</span>
+                <span className="text-xs font-medium">
+                  {entity?.repliesCount || ""}
+                </span>
               </button>
             </div>
 
@@ -269,11 +327,23 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
                   <button
                     className={
                       "transition-colors group cursor-pointer " +
-                      (isEntitySaved ? "text-blue-500" : "text-neutral-400 hover:text-blue-500")
+                      (isEntitySaved
+                        ? "text-blue-500"
+                        : "text-neutral-400 hover:text-blue-500")
                     }
                   >
-                    <div className={"p-1.5 rounded-full transition-colors " + (isEntitySaved ? "bg-blue-50" : "group-hover:bg-blue-50")}>
-                      <Bookmark size={14} fill={isEntitySaved ? "currentColor" : "none"} />
+                    <div
+                      className={
+                        "p-1.5 rounded-full transition-colors " +
+                        (isEntitySaved
+                          ? "bg-blue-50"
+                          : "group-hover:bg-blue-50")
+                      }
+                    >
+                      <Bookmark
+                        size={14}
+                        fill={isEntitySaved ? "currentColor" : "none"}
+                      />
                     </div>
                   </button>
                 }
@@ -297,7 +367,9 @@ export default function Tweet({ onAuthRequired, handleSelectEntity }: TweetProps
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-6 max-w-sm mx-4 shadow-2xl border border-neutral-100">
-            <h3 className="text-base font-semibold text-neutral-900 mb-1.5">Delete post?</h3>
+            <h3 className="text-base font-semibold text-neutral-900 mb-1.5">
+              Delete post?
+            </h3>
             <p className="text-neutral-500 text-sm mb-5">
               This can't be undone.
             </p>

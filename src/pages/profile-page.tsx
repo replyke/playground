@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll";
 import { useParams, Link } from "react-router-dom";
 import {
+  EntityListSortByOptions,
   EntityProvider,
+  SortByReaction,
+  TimeFrame,
   useEntityList,
   useFetchUser,
   useFollowManager,
@@ -29,7 +32,9 @@ export default function ProfilePage() {
   const { userId } = useParams<{ userId: string }>();
   const { user: currentUser, updateUser } = useUser();
   const fetchUser = useFetchUser();
-  const { isFollowing, isLoading, toggleFollow } = useFollowManager({ userId: userId ?? "" });
+  const { isFollowing, isLoading, toggleFollow } = useFollowManager({
+    userId: userId ?? "",
+  });
 
   const {
     entities,
@@ -44,8 +49,12 @@ export default function ProfilePage() {
   const [highlightBar, setHighlightBar] = useState(false);
   const sentinelRef = useInfiniteScroll(loadMore, hasMore, loadingEntities);
   const [content, setContent] = useState("");
-  const [sortBy, setSortBy] = useState("new");
-  const [timeFrame, setTimeFrame] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<EntityListSortByOptions>("new");
+  const [timeFrame, setTimeFrame] = useState<TimeFrame | null | undefined>(
+    null,
+  );
+  const [sortByReaction, setSortByReaction] = useState<SortByReaction>("like");
+
   const [profileUser, setProfileUser] = useState<ProfileUser | null>(null);
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [isEditingBirthdate, setIsEditingBirthdate] = useState(false);
@@ -57,13 +66,17 @@ export default function ProfilePage() {
 
   useEffect(() => {
     if (!userId) return;
-    const filters: Record<string, unknown> = { sortBy, timeFrame, userId: [userId] };
+    const filters: Record<string, unknown> = {
+      sortBy,
+      timeFrame,
+      userId: [userId],
+    };
     if (content.length) filters.contentFilters = { includes: [content] };
     fetchEntities(
       filters,
       {},
       { sourceId: "tweets", limit: 10 },
-      { resetFilters: true, clearImmediately: false }
+      { resetFilters: true, clearImmediately: false },
     );
   }, [userId, sortBy, timeFrame, content]);
 
@@ -80,8 +93,10 @@ export default function ProfilePage() {
       setEditBio(profileUser.bio || "");
       setEditBirthdate(
         profileUser.birthdate
-          ? new Date(profileUser.birthdate as string).toISOString().split("T")[0]
-          : ""
+          ? new Date(profileUser.birthdate as string)
+              .toISOString()
+              .split("T")[0]
+          : "",
       );
     }
   }, [profileUser]);
@@ -107,7 +122,8 @@ export default function ProfilePage() {
     try {
       const birthdateObj = editBirthdate ? new Date(editBirthdate) : null;
       await updateUser({ birthdate: birthdateObj });
-      if (profileUser) setProfileUser({ ...profileUser, birthdate: birthdateObj });
+      if (profileUser)
+        setProfileUser({ ...profileUser, birthdate: birthdateObj });
       setIsEditingBirthdate(false);
     } catch (error) {
       console.error("Failed to update birthdate:", error);
@@ -118,7 +134,7 @@ export default function ProfilePage() {
     setEditBirthdate(
       profileUser?.birthdate
         ? new Date(profileUser.birthdate as string).toISOString().split("T")[0]
-        : ""
+        : "",
     );
     setIsEditingBirthdate(false);
   };
@@ -155,7 +171,9 @@ export default function ProfilePage() {
                 {profileUser?.username ? `@${profileUser.username}` : "Profile"}
               </h1>
               {entities.length > 0 && (
-                <p className="text-xs text-neutral-400">{entities.length} posts</p>
+                <p className="text-xs text-neutral-400">
+                  {entities.length} posts
+                </p>
               )}
             </div>
           </div>
@@ -166,7 +184,9 @@ export default function ProfilePage() {
                 <div
                   className="h-36 overflow-hidden"
                   style={{
-                    backgroundImage: bannerStyle?.backgroundImage || "linear-gradient(135deg, #fb7185 0%, #818cf8 100%)",
+                    backgroundImage:
+                      bannerStyle?.backgroundImage ||
+                      "linear-gradient(135deg, #fb7185 0%, #818cf8 100%)",
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                   }}
@@ -214,12 +234,16 @@ export default function ProfilePage() {
                         <div className="flex items-start justify-between group">
                           <div className="flex-1">
                             {profileUser.bio ? (
-                              <p className="text-neutral-700 text-sm leading-relaxed">{profileUser.bio}</p>
+                              <p className="text-neutral-700 text-sm leading-relaxed">
+                                {profileUser.bio}
+                              </p>
                             ) : (
                               <div className="flex items-center gap-2 text-neutral-400">
                                 <UserIcon size={13} />
                                 <span className="text-sm italic">
-                                  {isCurrentUser ? "Add a bio to tell people about yourself" : "No bio yet"}
+                                  {isCurrentUser
+                                    ? "Add a bio to tell people about yourself"
+                                    : "No bio yet"}
                                 </span>
                               </div>
                             )}
@@ -265,7 +289,9 @@ export default function ProfilePage() {
                             {profileUser.birthdate ? (
                               <span className="text-neutral-600 text-sm">
                                 Born{" "}
-                                {new Date(profileUser.birthdate as string).toLocaleDateString("en-US", {
+                                {new Date(
+                                  profileUser.birthdate as string,
+                                ).toLocaleDateString("en-US", {
                                   month: "long",
                                   day: "numeric",
                                   year: "numeric",
@@ -273,7 +299,9 @@ export default function ProfilePage() {
                               </span>
                             ) : (
                               <span className="text-neutral-400 text-sm italic">
-                                {isCurrentUser ? "Add your birthdate" : "Birthdate not set"}
+                                {isCurrentUser
+                                  ? "Add your birthdate"
+                                  : "Birthdate not set"}
                               </span>
                             )}
                           </div>
@@ -291,11 +319,17 @@ export default function ProfilePage() {
 
                     <div className="flex items-center gap-4 text-sm text-neutral-400">
                       <span>
-                        <span className="font-semibold text-neutral-900">{entities.length}</span> posts
+                        <span className="font-semibold text-neutral-900">
+                          {entities.length}
+                        </span>{" "}
+                        posts
                       </span>
                       <span>
                         Joined{" "}
-                        {new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+                        {new Date().toLocaleDateString("en-US", {
+                          month: "long",
+                          year: "numeric",
+                        })}
                       </span>
                     </div>
                   </div>
@@ -324,6 +358,8 @@ export default function ProfilePage() {
             setSortBy={setSortBy}
             timeFrame={timeFrame}
             setTimeFrame={setTimeFrame}
+            sortByReaction={sortByReaction}
+            setSortByReaction={setSortByReaction}
             content={content}
             setContent={setContent}
           />
@@ -351,7 +387,9 @@ export default function ProfilePage() {
 
           {!hasMore && !loadingEntities && entities.length > 0 && (
             <div className="p-6 flex justify-center border-t border-neutral-100">
-              <span className="text-neutral-400 text-sm">You're all caught up</span>
+              <span className="text-neutral-400 text-sm">
+                You're all caught up
+              </span>
             </div>
           )}
         </div>

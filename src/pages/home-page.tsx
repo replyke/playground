@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { EntityProvider, useEntityList } from "@replyke/react-js";
+import {
+  EntityListFilters,
+  EntityListSortByOptions,
+  EntityProvider,
+  SortByReaction,
+  TimeFrame,
+  useEntityList,
+} from "@replyke/react-js";
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll";
 import Tweet from "../components/tweet";
 import TweetComposer from "../components/tweet-composer";
@@ -23,18 +30,21 @@ export default function TweetFeed() {
   const [highlightBar, setHighlightBar] = useState(false);
   const sentinelRef = useInfiniteScroll(loadMore, hasMore, loadingEntities);
   const [content, setContent] = useState("");
-  const [sortBy, setSortBy] = useState("new");
-  const [timeFrame, setTimeFrame] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<EntityListSortByOptions>("new");
+  const [timeFrame, setTimeFrame] = useState<TimeFrame | null | undefined>(
+    null,
+  );
+  const [sortByReaction, setSortByReaction] = useState<SortByReaction>("like");
 
   useEffect(() => {
-    const filters: Record<string, unknown> = { sortBy, timeFrame };
+    const filters: EntityListFilters = { timeFrame };
 
     if (content.length) {
       filters.contentFilters = { includes: [content] };
     }
     fetchEntities(
       filters,
-      {},
+      { sortBy, sortByReaction: sortBy === "top" ? sortByReaction : undefined },
       {
         sourceId: "tweets",
         limit: 10,
@@ -42,7 +52,7 @@ export default function TweetFeed() {
       },
       { resetFilters: true, clearImmediately: false },
     );
-  }, [sortBy, timeFrame, content]);
+  }, [sortBy, timeFrame, content, sortByReaction]);
 
   function handleAuthRequired() {
     setHighlightBar(true);
@@ -75,6 +85,8 @@ export default function TweetFeed() {
             setSortBy={setSortBy}
             timeFrame={timeFrame}
             setTimeFrame={setTimeFrame}
+            sortByReaction={sortByReaction}
+            setSortByReaction={setSortByReaction}
             content={content}
             setContent={setContent}
           />
@@ -96,7 +108,9 @@ export default function TweetFeed() {
 
           {!hasMore && !loadingEntities && entities.length > 0 && (
             <div className="p-6 flex justify-center items-center border-t border-neutral-100">
-              <span className="text-neutral-400 text-sm">You're all caught up</span>
+              <span className="text-neutral-400 text-sm">
+                You're all caught up
+              </span>
             </div>
           )}
         </div>

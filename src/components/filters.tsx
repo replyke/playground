@@ -1,11 +1,18 @@
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import {
+  EntityListSortByOptions,
+  SortByReaction,
+  TimeFrame,
+} from "@replyke/react-js";
 
 interface FiltersProps {
-  sortBy: string;
-  setSortBy: (value: string) => void;
-  timeFrame: string | null;
-  setTimeFrame: (value: string | null) => void;
+  sortBy: EntityListSortByOptions;
+  setSortBy: (value: EntityListSortByOptions) => void;
+  timeFrame: TimeFrame | null | undefined;
+  setTimeFrame: (value: TimeFrame | null | undefined) => void;
+  sortByReaction: SortByReaction;
+  setSortByReaction: (value: SortByReaction) => void;
   content: string;
   setContent: (value: string) => void;
 }
@@ -14,7 +21,6 @@ const SORT_OPTIONS = [
   { value: "new", label: "New" },
   { value: "hot", label: "Hot" },
   { value: "top", label: "Top" },
-  { value: "controversial", label: "Controversial" },
 ];
 
 const TIME_OPTIONS = [
@@ -26,7 +32,27 @@ const TIME_OPTIONS = [
   { value: "year", label: "1y" },
 ];
 
-export default function Filters({ sortBy, setSortBy, timeFrame, setTimeFrame, content, setContent }: FiltersProps) {
+const REACTION_OPTIONS: { value: SortByReaction; emoji: string }[] = [
+  { value: "like", emoji: "❤️" },
+  { value: "love", emoji: "😍" },
+  { value: "funny", emoji: "😂" },
+  { value: "wow", emoji: "😮" },
+  { value: "sad", emoji: "😢" },
+  { value: "angry", emoji: "😡" },
+  { value: "upvote", emoji: "👍" },
+  { value: "downvote", emoji: "👎" },
+];
+
+export default function Filters({
+  sortBy,
+  setSortBy,
+  timeFrame,
+  setTimeFrame,
+  sortByReaction,
+  setSortByReaction,
+  content,
+  setContent,
+}: FiltersProps) {
   const [localSearch, setLocalSearch] = useState(content);
 
   useEffect(() => {
@@ -37,7 +63,10 @@ export default function Filters({ sortBy, setSortBy, timeFrame, setTimeFrame, co
   return (
     <div className="px-4 py-2.5 border-b border-neutral-100 bg-white space-y-2.5">
       <div className="relative">
-        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+        <Search
+          size={12}
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
+        />
         <input
           type="text"
           placeholder="Search posts..."
@@ -52,7 +81,7 @@ export default function Filters({ sortBy, setSortBy, timeFrame, setTimeFrame, co
           <button
             key={opt.value}
             onClick={() => {
-              setSortBy(opt.value);
+              setSortBy(opt.value as EntityListSortByOptions);
               if (opt.value === "new") setTimeFrame(null);
             }}
             className={
@@ -66,23 +95,43 @@ export default function Filters({ sortBy, setSortBy, timeFrame, setTimeFrame, co
           </button>
         ))}
 
+        {sortBy === "top" && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {REACTION_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                onClick={() => setSortByReaction(opt.value)}
+                title={opt.value}
+                className={
+                  "size-7 rounded-full text-sm transition-all cursor-pointer flex items-center justify-center border " +
+                  (sortByReaction === opt.value
+                    ? "border-rose-500 bg-rose-50 scale-110"
+                    : "border-neutral-200 hover:border-rose-300 hover:bg-rose-50")
+                }
+              >
+                {opt.emoji}
+              </button>
+            ))}
+          </div>
+        )}
         {sortBy !== "new" && (
           <>
             <span className="text-neutral-200 text-xs mx-0.5">|</span>
-            {TIME_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => setTimeFrame(opt.value || null)}
-                className={
-                  "px-3 py-1 rounded-full text-xs font-medium transition-colors cursor-pointer " +
-                  ((timeFrame ?? "") === opt.value
-                    ? "bg-neutral-800 text-white border border-neutral-700"
-                    : "border border-neutral-200 text-neutral-500 hover:border-neutral-400 hover:text-neutral-700")
-                }
-              >
-                {opt.label}
-              </button>
-            ))}
+            <select
+              value={timeFrame ?? ""}
+              onChange={(e) =>
+                setTimeFrame(
+                  (e.target.value as TimeFrame | null | undefined) || null,
+                )
+              }
+              className="px-2 py-1 rounded-full text-xs font-medium border border-neutral-200 text-neutral-600 bg-white cursor-pointer focus:outline-none focus:border-neutral-400 transition-colors"
+            >
+              {TIME_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
           </>
         )}
       </div>
