@@ -243,7 +243,7 @@ export default function UserBar({ highlighted, onHighlightEnd }: UserBarProps) {
               </form>
 
               <a
-                href="https://github.com/replyke"
+                href="https://github.com/replyke/playground"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-neutral-400 hover:text-neutral-700 transition-colors p-1.5 rounded-lg hover:bg-neutral-100 shrink-0"
