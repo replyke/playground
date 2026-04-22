@@ -98,6 +98,14 @@ export default function Tweet({
     0,
   );
 
+  // Top reaction types that have at least one reaction, sorted by count descending
+  const activeReactionEmojis = Object.entries(reactionCounts ?? {})
+    .filter(([, count]) => (count ?? 0) > 0)
+    .sort(([, a], [, b]) => (b ?? 0) - (a ?? 0))
+    .slice(0, 3)
+    .map(([type]) => REACTION_EMOJIS[type as ReactionType])
+    .filter(Boolean);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -196,38 +204,83 @@ export default function Tweet({
               </span>
             </div>
 
-            <div className="relative" ref={dropdownRef}>
-              <button
-                onClick={() => setShowDropdown(!showDropdown)}
-                className="p-1.5 rounded-full hover:bg-neutral-100 transition-colors text-neutral-400 hover:text-neutral-600"
-              >
-                <MoreHorizontal size={14} />
-              </button>
-              {showDropdown && (
-                <div className="absolute right-0 top-8 bg-white border border-neutral-200 rounded-xl shadow-lg py-1.5 z-10 min-w-36 overflow-hidden">
-                  {isAuthor ? (
+            <div className="flex items-center gap-1">
+              {user ? (
+                <ResponsiveDrawer
+                  open={isBookmarkDrawerOpen}
+                  onOpenChange={setIsBookmarkDrawerOpen}
+                  title="Add to Collection"
+                  trigger={
                     <button
-                      onClick={() => {
-                        setShowDropdown(false);
-                        setShowDeleteConfirm(true);
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      className={
+                        "transition-colors group cursor-pointer " +
+                        (isEntitySaved
+                          ? "text-blue-500"
+                          : "text-neutral-400 hover:text-blue-500")
+                      }
                     >
-                      Delete post
+                      <div
+                        className={
+                          "p-1.5 rounded-full transition-colors " +
+                          (isEntitySaved
+                            ? "bg-blue-50"
+                            : "group-hover:bg-blue-50")
+                        }
+                      >
+                        <Bookmark
+                          size={14}
+                          fill={isEntitySaved ? "currentColor" : "none"}
+                        />
+                      </div>
                     </button>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setShowDropdown(false);
-                        setShowReportDialog(true);
-                      }}
-                      className="w-full text-left px-3.5 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
-                    >
-                      Report post
-                    </button>
-                  )}
-                </div>
+                  }
+                >
+                  <CollectionsDialog setIsEntitySaved={setIsEntitySaved} />
+                </ResponsiveDrawer>
+              ) : (
+                <button
+                  onClick={handleBookmarkClick}
+                  className="text-neutral-400 hover:text-blue-500 transition-colors group cursor-pointer"
+                >
+                  <div className="p-1.5 rounded-full group-hover:bg-blue-50 transition-colors">
+                    <Bookmark size={14} />
+                  </div>
+                </button>
               )}
+
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setShowDropdown(!showDropdown)}
+                  className="p-1.5 rounded-full hover:bg-neutral-100 transition-colors text-neutral-400 hover:text-neutral-600"
+                >
+                  <MoreHorizontal size={14} />
+                </button>
+                {showDropdown && (
+                  <div className="absolute right-0 top-8 bg-white border border-neutral-200 rounded-xl shadow-lg py-1.5 z-10 min-w-36 overflow-hidden">
+                    {isAuthor ? (
+                      <button
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                      >
+                        Delete post
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          setShowDropdown(false);
+                          setShowReportDialog(true);
+                        }}
+                        className="w-full text-left px-3.5 py-2 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors"
+                      >
+                        Report post
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -244,36 +297,39 @@ export default function Tweet({
                 onMouseEnter={() => setShowReactionPicker(true)}
                 onMouseLeave={handleReactionMouseLeave}
               >
-                <button
-                  onClick={handleReactionClick}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={handleTouchEnd}
-                  onTouchMove={handleTouchEnd}
-                  className={
-                    "flex items-center gap-1.5 transition-colors group cursor-pointer " +
-                    (currentReaction
-                      ? "text-rose-500"
-                      : "text-neutral-400 hover:text-rose-500")
-                  }
-                >
-                  <div
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={handleReactionClick}
+                    onTouchStart={handleTouchStart}
+                    onTouchEnd={handleTouchEnd}
+                    onTouchMove={handleTouchEnd}
                     className={
-                      "p-1.5 rounded-full transition-colors text-base leading-none " +
+                      "flex items-center gap-1.5 transition-colors group cursor-pointer " +
                       (currentReaction
-                        ? "bg-rose-50"
-                        : "group-hover:bg-rose-50")
+                        ? "text-rose-500"
+                        : "text-neutral-400 hover:text-rose-500")
                     }
                   >
-                    {currentReaction ? (
-                      REACTION_EMOJIS[currentReaction as ReactionType]
-                    ) : (
-                      <SmilePlus size={14} />
-                    )}
-                  </div>
-                  <span className="text-xs font-medium">
-                    {totalReactions > 0 ? totalReactions : ""}
-                  </span>
-                </button>
+                    <div
+                      className={
+                        "p-1.5 rounded-full transition-colors text-base leading-none " +
+                        (currentReaction
+                          ? "bg-rose-50"
+                          : "group-hover:bg-rose-50")
+                      }
+                    >
+                      {currentReaction ? (
+                        REACTION_EMOJIS[currentReaction as ReactionType]
+                      ) : (
+                        <SmilePlus size={14} />
+                      )}
+                    </div>
+                    <span className="text-xs font-medium">
+                      {totalReactions > 0 ? totalReactions : ""}
+                    </span>
+                  </button>
+
+                </div>
 
                 {showReactionPicker && (
                   <div
@@ -318,47 +374,12 @@ export default function Tweet({
               </button>
             </div>
 
-            {user ? (
-              <ResponsiveDrawer
-                open={isBookmarkDrawerOpen}
-                onOpenChange={setIsBookmarkDrawerOpen}
-                title="Add to Collection"
-                trigger={
-                  <button
-                    className={
-                      "transition-colors group cursor-pointer " +
-                      (isEntitySaved
-                        ? "text-blue-500"
-                        : "text-neutral-400 hover:text-blue-500")
-                    }
-                  >
-                    <div
-                      className={
-                        "p-1.5 rounded-full transition-colors " +
-                        (isEntitySaved
-                          ? "bg-blue-50"
-                          : "group-hover:bg-blue-50")
-                      }
-                    >
-                      <Bookmark
-                        size={14}
-                        fill={isEntitySaved ? "currentColor" : "none"}
-                      />
-                    </div>
-                  </button>
-                }
-              >
-                <CollectionsDialog setIsEntitySaved={setIsEntitySaved} />
-              </ResponsiveDrawer>
-            ) : (
-              <button
-                onClick={handleBookmarkClick}
-                className="text-neutral-400 hover:text-blue-500 transition-colors group cursor-pointer"
-              >
-                <div className="p-1.5 rounded-full group-hover:bg-blue-50 transition-colors">
-                  <Bookmark size={14} />
-                </div>
-              </button>
+            {activeReactionEmojis.length > 0 && (
+              <div className="flex items-center -space-x-0.5 pointer-events-none">
+                {activeReactionEmojis.map((emoji, i) => (
+                  <span key={i} className="text-sm leading-none">{emoji}</span>
+                ))}
+              </div>
             )}
           </div>
         </div>
