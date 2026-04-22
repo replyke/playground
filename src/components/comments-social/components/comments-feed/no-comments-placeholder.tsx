@@ -1,15 +1,17 @@
+import useUIState from "../../hooks/use-ui-state";
+
 function NoCommentsPlaceHolder() {
   return (
-    <div>
+    <div
+      className="p-4 h-full flex flex-col justify-center"
+    >
       <p
-        className="text-center text-lg font-bold text-gray-800 dark:text-gray-200 mb-2"
-        // 🎨 CUSTOMIZATION: No comments title styling
+        className="text-center text-lg font-bold mb-2 text-gray-900 dark:text-gray-50"
       >
         No comments yet
       </p>
       <p
         className="text-center text-xs text-gray-500 dark:text-gray-400 mt-0"
-        // 🎨 CUSTOMIZATION: No comments subtitle styling
       >
         Start the conversation.
       </p>

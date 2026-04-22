@@ -1,55 +1,43 @@
-import { Comment, useCommentSection, useUser } from "@replyke/react-js";
+import {
+  useCommentSection,
+  useUser,
+  Comment as CommentType,
+  useReactionToggle,
+} from "@replyke/react-js";
 import { cn } from "@/lib/utils";
 
-// useCommentVotes was removed in @replyke/react-js v7 — vote actions are stubs until API is updated
-const useCommentVotes = (_props: { comment: Comment; setComment: (c: Comment) => void }) => ({
-  upvoteComment: undefined as (() => void) | undefined,
-  downvoteComment: undefined as (() => void) | undefined,
-  removeCommentUpvote: undefined as (() => void) | undefined,
-  removeCommentDownvote: undefined as (() => void) | undefined,
-});
-
 interface VoteButtonsProps {
-  comment: Comment;
-  setComment: (c: Comment) => void;
-  size?: "small" | "large";
+  comment: CommentType;
+  size?: "small" | "normal";
 }
 
-function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) {
+function VoteButtons({
+  comment,
+  size = "small",
+}: VoteButtonsProps) {
   const { user } = useUser();
   const { callbacks } = useCommentSection();
 
-  const {
-    upvoteComment,
-    downvoteComment,
-    removeCommentUpvote,
-    removeCommentDownvote,
-  } = useCommentVotes({ comment, setComment });
+  const { currentReaction, reactionCounts, toggleReaction } = useReactionToggle({
+    targetType: "comment",
+    targetId: comment.id,
+    initialReaction: comment.userReaction,
+    initialReactionCounts: comment.reactionCounts,
+  });
 
-  const upvotes = comment.upvotes?.length || 0;
-  const downvotes = comment.downvotes?.length || 0;
-  const netScore = upvotes - downvotes;
+  const netScore = (reactionCounts.upvote || 0) - (reactionCounts.downvote || 0);
 
-  const userUpvotedComment = !!(user && comment.upvotes.includes(user.id));
-  const userDownvotedComment = !!(user && comment.downvotes.includes(user.id));
-  const userVote = userUpvotedComment ? "up" : userDownvotedComment ? "down" : null;
+  const userVote: "up" | "down" | null = currentReaction === "upvote"
+    ? "up"
+    : currentReaction === "downvote"
+    ? "down"
+    : null;
 
   const handleVote = (voteType: "up" | "down") => {
-    if (voteType === "up") {
-      if (userUpvotedComment) {
-        removeCommentUpvote?.();
-      } else {
-        upvoteComment?.();
-      }
-    } else {
-      if (userDownvotedComment) {
-        removeCommentDownvote?.();
-      } else {
-        downvoteComment?.();
-      }
-    }
+    toggleReaction({ reactionType: voteType === "up" ? "upvote" : "downvote" });
   };
 
+  // 🎨 CUSTOMIZATION: Vote button sizing
   const iconClass = size === "small" ? "w-3 h-3" : "w-4 h-4";
   const textClass = size === "small" ? "text-xs" : "text-sm";
   const paddingClass = size === "small" ? "px-2 py-1" : "px-3 py-1.5";
@@ -57,6 +45,7 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
   return (
     <div
       className={cn(
+        // 🎨 CUSTOMIZATION: Vote button container styling
         "inline-flex items-center",
         "bg-gray-50 dark:bg-gray-700",
         "rounded-full",
@@ -64,10 +53,12 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
         "gap-1"
       )}
     >
+      {/* Upvote Button */}
       <button
         onClick={() => {
           if (!user) {
-            callbacks?.loginRequiredCallback?.();
+
+              callbacks?.loginRequiredCallback?.();
             return;
           }
           if (!user.username && callbacks?.usernameRequiredCallback) {
@@ -77,6 +68,7 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
           handleVote("up");
         }}
         className={cn(
+          // 🎨 CUSTOMIZATION: Upvote button styling
           "p-1 rounded-full",
           "transition-colors duration-150",
           "flex items-center justify-center",
@@ -87,13 +79,25 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
         )}
         title="Upvote"
       >
-        <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 15.75 7.5-7.5 7.5 7.5" />
+        <svg
+          className={iconClass}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m4.5 15.75 7.5-7.5 7.5 7.5"
+          />
         </svg>
       </button>
 
+      {/* Score */}
       <span
         className={cn(
+          // 🎨 CUSTOMIZATION: Score display styling
           "font-medium min-w-[20px] text-center",
           textClass,
           netScore > 0
@@ -106,10 +110,12 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
         {netScore}
       </span>
 
+      {/* Downvote Button */}
       <button
         onClick={() => {
           if (!user) {
-            callbacks?.loginRequiredCallback?.();
+
+              callbacks?.loginRequiredCallback?.();
             return;
           }
           if (!user.username && callbacks?.usernameRequiredCallback) {
@@ -119,6 +125,7 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
           handleVote("down");
         }}
         className={cn(
+          // 🎨 CUSTOMIZATION: Downvote button styling
           "p-1 rounded-full",
           "transition-colors duration-150",
           "flex items-center justify-center",
@@ -129,8 +136,18 @@ function VoteButtons({ comment, setComment, size = "small" }: VoteButtonsProps) 
         )}
         title="Downvote"
       >
-        <svg className={iconClass} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+        <svg
+          className={iconClass}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="m19.5 8.25-7.5 7.5-7.5-7.5"
+          />
         </svg>
       </button>
     </div>

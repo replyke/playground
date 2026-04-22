@@ -33,7 +33,7 @@ const CommentsFeed = React.memo(
       !loading && mergedComments.length === 0 && !highlightedComment;
 
     return (
-      <div className="flex-1">
+      <div style={{ flex: 1 }}>
         {showLoadedComments && <LoadedComments data={mergedComments} />}
         {showFetchingSkeletons && <FetchingCommentsSkeletons />}
         {showNoComments && (customNoCommentsView ?? <NoCommentsPlaceHolder />)}

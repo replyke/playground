@@ -16,9 +16,10 @@ import {
   TabsTrigger,
 } from "../components/ui/tabs";
 import { ThreadedCommentSection } from "./comments-threaded";
+import { SocialCommentSection } from "./comments-social";
 
 interface CommentSectionSheetProps {
-  entity: unknown;
+  entity: Entity | null | undefined;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAuthRequired: () => void;
@@ -33,8 +34,9 @@ function CommentSectionSheet({
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useUser();
-
-  const [highlightedCommentId, setHighlightedCommentId] = useState<string | null>(null);
+  const [highlightedCommentId, setHighlightedCommentId] = useState<
+    string | null
+  >(null);
 
   const callbacks = useMemo(
     () => ({
@@ -46,7 +48,7 @@ function CommentSectionSheet({
         if (user) navigate("/u/" + user.id);
       },
     }),
-    []
+    [],
   );
 
   useEffect(() => {
@@ -81,7 +83,11 @@ function CommentSectionSheet({
             />
           </TabsContent>
           <TabsContent value="social">
-            sdsdsd
+            <SocialCommentSection
+              entity={entity as Entity | null}
+              highlightedCommentId={highlightedCommentId ?? undefined}
+              callbacks={callbacks}
+            />
           </TabsContent>
         </Tabs>
       </SheetContent>

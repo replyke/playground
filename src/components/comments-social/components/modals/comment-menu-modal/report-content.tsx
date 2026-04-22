@@ -8,13 +8,16 @@ import {
   useUser,
 } from "@replyke/react-js";
 import { FlagIcon } from "@replyke/ui-core-react-js";
-import useUIState from "../../../hooks/use-ui-state";
 import { cn } from "@/lib/utils";
+import useUIState from "../../../hooks/use-ui-state";
 
 function ReportContent({ resetView }: { resetView: () => void }) {
   const { user } = useUser();
   const { callbacks } = useCommentSection();
-  const { optionsComment, closeCommentOptionsModal } = useUIState();
+  const {
+    optionsComment,
+    closeCommentMenuModal
+  } = useUIState();
   const createCommentReport = useCreateReport({ type: "comment" });
 
   const [submitting, setSubmitting] = useState(false);
@@ -33,13 +36,9 @@ function ReportContent({ resetView }: { resetView: () => void }) {
         callbacks?.loginRequiredCallback?.();
         return;
       }
-      if (!user.username && callbacks?.usernameRequiredCallback) {
-        callbacks.usernameRequiredCallback();
-        return;
-      }
       setSubmitting(true);
       await createCommentReport({ targetId: optionsComment.id, reason });
-      closeCommentOptionsModal?.();
+      closeCommentMenuModal?.();
       setReason(null);
       resetView();
     } catch (err) {
@@ -52,10 +51,10 @@ function ReportContent({ resetView }: { resetView: () => void }) {
   return (
     <div className="p-6 w-full">
       <div className="flex items-center gap-4">
-        <FlagIcon size={24} color="currentColor" />
+        <FlagIcon size={24} />
         <span className="text-2xl text-gray-900 dark:text-gray-50">Submit a report</span>
       </div>
-      <p className="mt-6 text-gray-700 dark:text-gray-300">
+      <p className="mt-6 text-gray-900 dark:text-gray-200">
         Thank you for looking out for our community. Let us know what is
         happening, and we'll look into it.
       </p>
@@ -68,8 +67,8 @@ function ReportContent({ resetView }: { resetView: () => void }) {
             className={cn(
               "px-2 py-1 rounded-md cursor-pointer text-sm",
               key === reason
-                ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900"
-                : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400"
+                ? "bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900"
+                : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300"
             )}
           >
             {value}
@@ -81,18 +80,15 @@ function ReportContent({ resetView }: { resetView: () => void }) {
         onClick={handleSubmitReport}
         disabled={!buttonActive}
         className={cn(
-          "w-full mt-4",
-          "inline-flex items-center justify-center",
-          "px-4 py-2",
-          "text-sm font-medium leading-5",
-          "rounded-md",
-          "transition-colors duration-200",
+          "w-full mt-4 inline-flex items-center justify-center px-4 py-2",
+          "text-sm font-medium leading-5 rounded-md border-none",
           buttonActive
-            ? "bg-gray-900 dark:bg-white text-white dark:text-gray-900 cursor-pointer"
-            : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-500 cursor-not-allowed"
+            ? "bg-gray-900 dark:bg-gray-50 text-white dark:text-gray-900 cursor-pointer"
+            : "bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-500 cursor-not-allowed",
+          submitting && "opacity-70"
         )}
       >
-        {submitting ? "Submitting.." : "Submit Report"}
+        {submitting ? "Submitting..." : "Submit Report"}
       </button>
     </div>
   );

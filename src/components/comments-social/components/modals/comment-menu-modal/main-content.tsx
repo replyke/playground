@@ -1,13 +1,20 @@
+import { resetButton, resetUl } from "@replyke/ui-core-react-js";
 import useUIState from "../../../hooks/use-ui-state";
 
 function MainContent({ clickReport }: { clickReport: () => void }) {
-  const { closeCommentOptionsModal } = useUIState();
+  const {
+    closeCommentMenuModal
+  } = useUIState();
+
   return (
-    <ul className="w-full list-none m-0 p-0">
+    <ul
+      style={resetUl}
+      className="w-full"
+    >
       <li className="flex justify-center justify-self-center">
         <button
-          className="font-semibold text-red-600 dark:text-red-500 px-6 py-2 bg-transparent border-none cursor-pointer"
-          // 🎨 CUSTOMIZATION: Report button styling
+          style={resetButton}
+          className="font-semibold text-red-600 dark:text-red-400 px-6 py-2"
           onClick={clickReport}
         >
           Report
@@ -16,9 +23,9 @@ function MainContent({ clickReport }: { clickReport: () => void }) {
       <div className="h-px w-full bg-gray-200 dark:bg-gray-600" />
       <li className="flex justify-center justify-self-center">
         <button
-          className="text-gray-700 dark:text-gray-300 px-6 py-2 bg-transparent border-none cursor-pointer"
-          // 🎨 CUSTOMIZATION: Cancel button styling
-          onClick={closeCommentOptionsModal}
+          style={resetButton}
+          className="text-gray-900 dark:text-gray-50 px-6 py-2"
+          onClick={closeCommentMenuModal}
         >
           Cancel
         </button>

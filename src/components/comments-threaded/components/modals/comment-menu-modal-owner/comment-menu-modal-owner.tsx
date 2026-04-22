@@ -16,10 +16,10 @@ function CommentMenuModalOwner() {
       "Are you sure you want to delete this comment?"
     );
     if (userConfirmed && optionsComment) {
-      closeCommentOptionsModalOwner();
+      closeCommentOptionsModalOwner?.();
       await deleteComment?.({ commentId: optionsComment.id });
     } else {
-      closeCommentOptionsModalOwner();
+      closeCommentOptionsModalOwner?.();
     }
   };
 
@@ -36,6 +36,7 @@ function CommentMenuModalOwner() {
           <li className="flex justify-center justify-self-center">
             <button
               className="font-semibold text-red-600 dark:text-red-500 px-6 py-2 bg-transparent border-none cursor-pointer"
+              // 🎨 CUSTOMIZATION: Remove button styling
               onClick={handleDeleteComment}
             >
               Remove
@@ -45,6 +46,7 @@ function CommentMenuModalOwner() {
           <li className="flex justify-center justify-self-center">
             <button
               className="text-gray-700 dark:text-gray-300 px-6 py-2 bg-transparent border-none cursor-pointer"
+              // 🎨 CUSTOMIZATION: Cancel button styling
               onClick={closeCommentOptionsModalOwner}
             >
               Cancel

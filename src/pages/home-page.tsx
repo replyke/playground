@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import {
+  Entity,
   EntityListFilters,
   EntityListSortByOptions,
   EntityProvider,
@@ -25,7 +26,7 @@ export default function TweetFeed() {
     loadMore,
   } = useEntityList({ listId: "home-tweets" });
 
-  const [selectedEntity, setSelectedEntity] = useState<unknown>(null);
+  const [selectedEntity, setSelectedEntity] = useState<Entity | null | undefined>(null);
   const [commentSheetOpen, setCommentSheetOpen] = useState(false);
   const [highlightBar, setHighlightBar] = useState(false);
   const sentinelRef = useInfiniteScroll(loadMore, hasMore, loadingEntities);
@@ -58,7 +59,7 @@ export default function TweetFeed() {
     setHighlightBar(true);
   }
 
-  function handleSelectEntity(ent: unknown) {
+  function handleSelectEntity(ent: Entity | null | undefined) {
     setSelectedEntity(ent);
     setCommentSheetOpen(true);
   }

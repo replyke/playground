@@ -5,6 +5,7 @@ import {
   useEntityList,
   useUser,
   useReactionToggle,
+  Entity,
 } from "@replyke/react-js";
 import {
   MessageCircle,
@@ -57,7 +58,7 @@ const formatTimestamp = (timestamp: Date): string => {
 
 interface TweetProps {
   onAuthRequired: () => void;
-  handleSelectEntity: (entity: unknown) => void;
+  handleSelectEntity: (entity: Entity | null | undefined) => void;
 }
 
 export default function Tweet({

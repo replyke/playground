@@ -1,14 +1,12 @@
 import { cn } from "@/lib/utils";
 
-interface ToggleRepliesVisibilityProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
-}
-
-function ToggleRepliesVisibility({
+function ToggleRepliesVisibilty({
   isCollapsed,
   onToggleCollapse,
-}: ToggleRepliesVisibilityProps) {
+}: {
+  isCollapsed: boolean;
+  onToggleCollapse: () => void;
+}) {
   return (
     <button
       onClick={onToggleCollapse}
@@ -32,4 +30,4 @@ function ToggleRepliesVisibility({
   );
 }
 
-export default ToggleRepliesVisibility;
+export default ToggleRepliesVisibilty;

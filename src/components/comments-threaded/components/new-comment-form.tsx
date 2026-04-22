@@ -5,7 +5,6 @@ import {
   useUserMentions,
   useProject,
   handleError,
-  GifData,
 } from "@replyke/react-js";
 import {
   useTextareaCursorIndicator,
@@ -18,7 +17,7 @@ function NewCommentForm() {
   const { user } = useUser();
   const { project } = useProject();
   const giphyApiKey = project?.integrations.find((int) => int.name === "giphy")
-    ?.data.apiKey as string | undefined;
+    ?.data.apiKey;
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [content, setContent] = useState("");
@@ -38,10 +37,11 @@ function NewCommentForm() {
     mentionSuggestions,
     handleMentionClick,
     mentions,
+    addMention,
     resetMentions,
   } = useUserMentions({
     content: textAreaRef.current?.value || "",
-    setContent: (value) => {
+    setContent: (value: string) => {
       if (textAreaRef.current) {
         textAreaRef.current.value = value;
         setContent(value);
@@ -65,7 +65,7 @@ function NewCommentForm() {
       }
 
       if (!user) {
-        callbacks?.loginRequiredCallback?.();
+        callbacks?.loginRequiredCallback();
         return;
       }
 
@@ -75,24 +75,49 @@ function NewCommentForm() {
       }
 
       const tempContent = textArea.value.trim();
+      const tempMentions = mentions;
+
+      // Clear optimistically before the API call
+      textArea.value = "";
+      setContent("");
+      resetMentions();
       setIsSubmitting(true);
 
       try {
-        await createComment?.({ content: tempContent, mentions });
-        textArea.value = "";
-        setContent("");
-        resetMentions();
+        const result = await createComment?.({ content: tempContent, mentions: tempMentions });
+        if (result === undefined) {
+          // SDK handled the failure and removed the optimistic comment; restore textarea
+          textArea.value = tempContent;
+          setContent(tempContent);
+        }
       } catch (error) {
         console.error("Error creating comment:", error);
+        textArea.value = tempContent;
+        setContent(tempContent);
       } finally {
         setIsSubmitting(false);
       }
     },
-    [hasContent, isSubmitting, user, createComment, mentions, resetMentions, callbacks]
+    [
+      hasContent,
+      isSubmitting,
+      user,
+      createComment,
+      mentions,
+      resetMentions,
+      callbacks,
+    ]
   );
 
   const handleCreateGif = useCallback(
-    async (gif: GifData) => {
+    async (gif: {
+      id: string;
+      url: string;
+      gifUrl: string;
+      gifPreviewUrl: string;
+      altText: string | undefined;
+      aspectRatio: number;
+    }) => {
       if (!user) {
         callbacks?.loginRequiredCallback?.();
         setIsGiphyVisible(false);
@@ -114,7 +139,7 @@ function NewCommentForm() {
       setIsGiphyVisible(false);
 
       try {
-        await createComment?.({ gif, mentions });
+        await createComment!({ gif, mentions });
       } catch (err) {
         handleError(err, "Creating comment failed: ");
       }
@@ -122,6 +147,7 @@ function NewCommentForm() {
     [createComment, mentions, resetMentions, user, callbacks]
   );
 
+  // Add keyboard event handler for Enter key
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {
       if (event.key === "Enter" && !event.ctrlKey && !event.shiftKey) {
@@ -157,6 +183,7 @@ function NewCommentForm() {
         />
         <div
           className={cn(
+            // 🎨 CUSTOMIZATION: Comment form styling
             "flex items-end",
             "bg-white dark:bg-gray-800",
             "rounded-2xl",
@@ -171,8 +198,10 @@ function NewCommentForm() {
           <textarea
             ref={textAreaRef}
             onChange={(e) => setContent(e.target.value)}
+            // 🎨 CUSTOMIZATION: Comment form styling (Default placeholder)
             placeholder="Add your reply..."
             className={cn(
+              // 🎨 CUSTOMIZATION: Comment form styling
               "flex-1 p-2",
               "bg-transparent",
               "text-gray-900 dark:text-gray-50",
@@ -187,7 +216,8 @@ function NewCommentForm() {
               onClick={() => setIsGiphyVisible(true)}
               disabled={isSubmitting}
               className={cn(
-                "shrink-0 p-2",
+                // 🎨 CUSTOMIZATION: Comment form styling
+                "flex-shrink-0 p-2",
                 "border-none outline-none",
                 "font-normal text-xs",
                 "text-gray-50 dark:text-gray-50",
@@ -201,7 +231,8 @@ function NewCommentForm() {
               type="submit"
               disabled={!hasContent || isSubmitting}
               className={cn(
-                "shrink-0 p-2",
+                // 🎨 CUSTOMIZATION: Comment form styling
+                "flex-shrink-0 p-2",
                 "rounded-full",
                 "shadow-sm",
                 "transition-all duration-200",
@@ -214,6 +245,7 @@ function NewCommentForm() {
             >
               <svg
                 className={cn(
+                  // 🎨 CUSTOMIZATION: Comment form styling
                   "h-3 w-3",
                   "transition-transform duration-200",
                   hasContent && "hover:scale-110"

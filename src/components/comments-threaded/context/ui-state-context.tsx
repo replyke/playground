@@ -1,28 +1,38 @@
-import React, { createContext, useState, useMemo, useCallback, ReactNode } from "react";
-import { Comment } from "@replyke/react-js";
+import React, { createContext, useState, useMemo, useCallback } from "react";
+import { Comment as CommentType } from "@replyke/react-js";
 
-export interface UIStateContextValue {
+type UIStateContext = {
   isCommentOptionsModalOpen: boolean;
   isCommentOptionsModalOwnerOpen: boolean;
-  openCommentOptionsModal: (newComment?: Comment) => void;
+
+  openCommentOptionsModal: (newComment?: CommentType) => void;
   closeCommentOptionsModal: () => void;
-  openCommentOptionsModalOwner: (newComment?: Comment) => void;
+  openCommentOptionsModalOwner: (newComment?: CommentType) => void;
   closeCommentOptionsModalOwner: () => void;
-  optionsComment: Comment | null;
-  setOptionsComment: (comment: Comment | null) => void;
-}
 
-export const UIStateContext = createContext<UIStateContextValue>({} as UIStateContextValue);
+  optionsComment: CommentType | null;
+  setOptionsComment: React.Dispatch<React.SetStateAction<CommentType | null>>;
+};
 
-export const UIStateProvider = ({ children }: { children: ReactNode }) => {
+export const UIStateContext = createContext<Partial<UIStateContext>>(
+  {}
+);
+
+export const UIStateProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const [isCommentOptionsModalOpen, setIsCommentOptionsModalOpen] =
     useState(false);
   const [isCommentOptionsModalOwnerOpen, setIsCommentOptionsModalOwnerOpen] =
     useState(false);
 
-  const [optionsComment, setOptionsComment] = useState<Comment | null>(null);
+  const [optionsComment, setOptionsComment] = useState<CommentType | null>(
+    null
+  );
 
-  const openCommentOptionsModal = useCallback((newComment?: Comment) => {
+  const openCommentOptionsModal = useCallback((newComment?: CommentType) => {
     if (newComment) setOptionsComment(newComment);
     setIsCommentOptionsModalOpen(true);
   }, []);
@@ -32,7 +42,7 @@ export const UIStateProvider = ({ children }: { children: ReactNode }) => {
     setOptionsComment(null);
   }, []);
 
-  const openCommentOptionsModalOwner = useCallback((newComment?: Comment) => {
+  const openCommentOptionsModalOwner = useCallback((newComment?: CommentType) => {
     if (newComment) setOptionsComment(newComment);
     setIsCommentOptionsModalOwnerOpen(true);
   }, []);
@@ -42,27 +52,26 @@ export const UIStateProvider = ({ children }: { children: ReactNode }) => {
     setOptionsComment(null);
   }, []);
 
-  const contextValue = useMemo<UIStateContextValue>(
-    () => ({
-      isCommentOptionsModalOpen,
-      isCommentOptionsModalOwnerOpen,
-      openCommentOptionsModal,
-      closeCommentOptionsModal,
-      openCommentOptionsModalOwner,
-      closeCommentOptionsModalOwner,
-      optionsComment,
-      setOptionsComment,
-    }),
-    [
-      isCommentOptionsModalOpen,
-      isCommentOptionsModalOwnerOpen,
-      openCommentOptionsModal,
-      closeCommentOptionsModal,
-      openCommentOptionsModalOwner,
-      closeCommentOptionsModalOwner,
-      optionsComment,
-    ]
-  );
+  const contextValue = useMemo(() => ({
+    isCommentOptionsModalOpen,
+    isCommentOptionsModalOwnerOpen,
+
+    openCommentOptionsModal,
+    closeCommentOptionsModal,
+    openCommentOptionsModalOwner,
+    closeCommentOptionsModalOwner,
+
+    optionsComment,
+    setOptionsComment,
+  }), [
+    isCommentOptionsModalOpen,
+    isCommentOptionsModalOwnerOpen,
+    openCommentOptionsModal,
+    closeCommentOptionsModal,
+    openCommentOptionsModalOwner,
+    closeCommentOptionsModalOwner,
+    optionsComment,
+  ]);
 
   return (
     <UIStateContext.Provider value={contextValue}>

@@ -1,42 +1,66 @@
 import { useEffect, useMemo, useState } from "react";
-import { Comment, useCommentSection, useReplies } from "@replyke/react-js";
+import {
+  Comment as CommentType,
+  useCommentSection,
+  useReplies,
+} from "@replyke/react-js";
 import SingleComment from "./single-comment";
 import CommentReplies from "./comment-replies";
 
-interface CommentThreadProps {
-  comment: Comment;
+export interface CommentThreadProps {
+  comment: CommentType;
   depth: number;
   isLastReply?: boolean;
+  onDeleteComment?: (commentId: string) => void;
+  onReportComment?: (commentId: string) => void;
 }
 
-function CommentThread({ comment, depth, isLastReply = false }: CommentThreadProps) {
+function CommentThread({
+  comment,
+  depth,
+  isLastReply = false,
+}: CommentThreadProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [showAllReplies, setShowAllReplies] = useState(false);
 
   const { sortBy } = useCommentSection();
 
-  const { replies, newReplies, loading, setPage } = useReplies({
+  const { replies, newReplies, loading, page, setPage } = useReplies({
     commentId: comment.id,
-    sortBy: (sortBy as "top" | "new" | "old") || "new",
+    sortBy: sortBy || "new", // Add fallback instead of assertion
   });
 
   useEffect(() => {
+    // Reset the page when the comment changes
     setPage(1);
   }, [setPage]);
 
   const initialVisibleReplies = 3;
 
   const allReplies = useMemo(() => {
-    return [...(newReplies || []), ...(replies || [])];
-  }, [newReplies, replies]);
+    const combined = [...(newReplies || []), ...(replies || [])];
+    return combined;
+  }, [newReplies, replies, comment.content]);
 
   const visibleReplies = useMemo(() => {
-    return showAllReplies
+    const visible = showAllReplies
       ? allReplies
       : allReplies.slice(0, initialVisibleReplies);
-  }, [showAllReplies, allReplies]);
+    return visible;
+  }, [showAllReplies, allReplies, initialVisibleReplies, comment.content]);
 
-  const hiddenRepliesCount = Math.max(0, allReplies.length - initialVisibleReplies);
+  const hiddenRepliesCount = Math.max(
+    0,
+    allReplies.length - initialVisibleReplies
+  );
+
+  const handleToggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
+  const handleShowAllReplies = () => {
+    setShowAllReplies(true);
+  };
 
   const hasReplies = allReplies.length > 0;
   const replyCount = allReplies.length;
@@ -50,7 +74,7 @@ function CommentThread({ comment, depth, isLastReply = false }: CommentThreadPro
         isCollapsed={isCollapsed}
         replyCount={replyCount}
         isLastReply={isLastReply}
-        onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
+        onToggleCollapse={handleToggleCollapse}
       />
 
       <CommentReplies
@@ -60,7 +84,7 @@ function CommentThread({ comment, depth, isLastReply = false }: CommentThreadPro
         visibleReplies={visibleReplies}
         hiddenRepliesCount={hiddenRepliesCount}
         showAllReplies={showAllReplies}
-        onShowAllReplies={() => setShowAllReplies(true)}
+        onShowAllReplies={handleShowAllReplies}
         CommentThreadComponent={CommentThread}
       />
     </>

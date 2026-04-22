@@ -1,13 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { Comment, useCommentSection, useUser } from "@replyke/react-js";
+import { useEffect, useState } from "react";
+import {
+  useCommentSection,
+  useUser,
+  Comment as CommentType,
+} from "@replyke/react-js";
 import { cn } from "@/lib/utils";
 
-interface NewReplyFormProps {
-  comment: Comment;
+function NewReplyForm({
+  comment,
+  setShowReplyForm,
+}: {
+  comment: CommentType;
   setShowReplyForm: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
+}) {
   const { user } = useUser();
 
   const [replyContent, setReplyContent] = useState("");
@@ -24,7 +29,7 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
     }
 
     if (!user) {
-      callbacks?.loginRequiredCallback?.();
+      callbacks?.loginRequiredCallback();
       return;
     }
 
@@ -33,17 +38,28 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
       return;
     }
 
+    const tempContent = replyContent.trim();
+
+    // Clear optimistically before the API call
+    setReplyContent("");
+    setShowReplyForm(false);
     setIsSubmitting(true);
+
     try {
-      await createComment?.({
-        content: replyContent.trim(),
+      const result = await createComment?.({
+        content: tempContent,
         parentId: comment.id,
         mentions: [],
       });
-      setReplyContent("");
-      setShowReplyForm(false);
+      if (result === undefined) {
+        // SDK handled the failure and removed the optimistic comment; restore form
+        setReplyContent(tempContent);
+        setShowReplyForm(true);
+      }
     } catch (error) {
       console.error("Error creating reply:", error);
+      setReplyContent(tempContent);
+      setShowReplyForm(true);
     } finally {
       setIsSubmitting(false);
     }
@@ -56,11 +72,12 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
 
   const [spinRotation, setSpinRotation] = useState(0);
 
+  // Spinner animation effect
   useEffect(() => {
     if (isSubmitting) {
       const interval = setInterval(() => {
         setSpinRotation((prev) => (prev + 10) % 360);
-      }, 16);
+      }, 16); // ~60fps
       return () => clearInterval(interval);
     }
   }, [isSubmitting]);
@@ -68,9 +85,13 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
   const hasContent = replyContent.trim().length > 0;
 
   return (
-    <div className="mt-2">
+    <div
+      className="mt-2"
+      // 🎨 CUSTOMIZATION: Reply form spacing
+    >
       <div
         className={cn(
+          // 🎨 CUSTOMIZATION: Reply form styling
           "flex items-end",
           "bg-white dark:bg-gray-800",
           "rounded-2xl",
@@ -85,8 +106,10 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
         <textarea
           value={replyContent}
           onChange={(e) => setReplyContent(e.target.value)}
+          // 🎨 CUSTOMIZATION: Reply form placeholder
           placeholder="Add your reply..."
           className={cn(
+            // 🎨 CUSTOMIZATION: Reply form textarea styling
             "flex-1 py-1.5 px-2",
             "bg-transparent",
             "text-gray-900 dark:text-gray-50",
@@ -99,6 +122,7 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
           <button
             onClick={handleCancelReply}
             className={cn(
+              // 🎨 CUSTOMIZATION: Cancel button styling
               "px-2 py-1",
               "text-xs",
               "text-gray-600 dark:text-gray-400",
@@ -116,7 +140,8 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
             onClick={handleReply}
             disabled={!hasContent || isSubmitting}
             className={cn(
-              "shrink-0 p-1.5",
+              // 🎨 CUSTOMIZATION: Submit button styling
+              "flex-shrink-0 p-1.5",
               "rounded-full",
               "shadow-sm",
               "transition-all duration-200",
@@ -130,11 +155,14 @@ function NewReplyForm({ comment, setShowReplyForm }: NewReplyFormProps) {
             {isSubmitting ? (
               <div
                 className="h-3 w-3 border border-gray-50 dark:border-gray-50 border-t-transparent rounded-full transition-transform duration-100 linear"
-                style={{ transform: `rotate(${spinRotation}deg)` }}
-              />
+                style={{
+                  transform: `rotate(${spinRotation}deg)`,
+                }}
+              ></div>
             ) : (
               <svg
                 className={cn(
+                  // 🎨 CUSTOMIZATION: Submit icon styling
                   "h-3 w-3",
                   "transition-transform duration-200",
                   hasContent && "hover:scale-110"

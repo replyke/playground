@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll";
 import { useParams, Link } from "react-router-dom";
 import {
+  Entity,
   EntityListSortByOptions,
   EntityProvider,
   SortByReaction,
@@ -44,7 +45,7 @@ export default function ProfilePage() {
     loadMore,
   } = useEntityList({ listId: "profile-tweets-" + userId });
 
-  const [selectedEntity, setSelectedEntity] = useState<unknown>(null);
+  const [selectedEntity, setSelectedEntity] = useState<Entity | null | undefined>(null);
   const [commentSheetOpen, setCommentSheetOpen] = useState(false);
   const [highlightBar, setHighlightBar] = useState(false);
   const sentinelRef = useInfiniteScroll(loadMore, hasMore, loadingEntities);
@@ -139,7 +140,7 @@ export default function ProfilePage() {
     setIsEditingBirthdate(false);
   };
 
-  function handleSelectEntity(ent: unknown) {
+  function handleSelectEntity(ent: Entity | null | undefined) {
     setSelectedEntity(ent);
     setCommentSheetOpen(true);
   }

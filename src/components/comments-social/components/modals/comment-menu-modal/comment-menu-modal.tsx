@@ -1,24 +1,36 @@
 import { useState } from "react";
-import { Modal } from "@replyke/ui-core-react-js";
+import { Modal, resetDiv } from "@replyke/ui-core-react-js";
+import { cn } from "@/lib/utils";
 import useUIState from "../../../hooks/use-ui-state";
 import MainContent from "./main-content";
 import ReportContent from "./report-content";
 
 function CommentMenuModal() {
-  const { isCommentOptionsModalOpen, closeCommentOptionsModal } = useUIState();
+  const {
+    isCommentMenuModalOpen,
+    closeCommentMenuModal
+  } = useUIState();
+
   const [view, setView] = useState<"main" | "report">("main");
 
   return (
     <Modal
-      show={!!isCommentOptionsModalOpen}
+      show={!!isCommentMenuModalOpen}
       onClose={() => {
-        closeCommentOptionsModal?.();
+        closeCommentMenuModal?.();
         setView("main");
       }}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-[520px] self-center py-2"
+        style={resetDiv}
+        className={cn(
+          "bg-white dark:bg-gray-800",
+          "rounded-lg",
+          "w-full max-w-[520px]",
+          "self-center",
+          "py-2"
+        )}
       >
         {view === "main" && (
           <MainContent clickReport={() => setView("report")} />

@@ -19,7 +19,9 @@ function MentionSuggestions({
   if (!isMentionActive) return null;
 
   return (
-    <div className="absolute bottom-full left-0 right-0 z-50 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-lg max-h-[200px] overflow-y-auto mb-2">
+    <div
+      className="absolute bottom-full left-0 right-0 z-50 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-600 shadow-lg max-h-[200px] overflow-y-auto mb-2"
+    >
       <div className="p-3">
         {isLoadingMentions ? (
           <div className="flex flex-col gap-2">
