@@ -91,7 +91,7 @@ export default function TweetFeed() {
             setContent={setContent}
           />
 
-          <div className="divide-y divide-neutral-100">
+          <div className="flex flex-col gap-3 p-4">
             {entities.map((entity) => (
               <EntityProvider entity={entity} key={entity.id}>
                 <Tweet

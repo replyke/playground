@@ -171,7 +171,7 @@ export default function Tweet({
   };
 
   return (
-    <div className="px-4 py-3.5 hover:bg-neutral-50/70 transition-colors duration-150">
+    <div className="px-4 py-3.5 bg-white rounded-2xl border border-neutral-200 shadow-sm hover:shadow-md hover:border-neutral-300 transition-all duration-150">
       <div className="flex gap-3">
         <UserHoverCard user={(entity?.user as Record<string, unknown>) || {}}>
           <Link
