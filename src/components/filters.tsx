@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search } from "lucide-react";
+import { RefreshCw, Search } from "lucide-react";
 import {
   EntityListSortByOptions,
   SortByReaction,
@@ -15,6 +15,8 @@ interface FiltersProps {
   setSortByReaction: (value: SortByReaction) => void;
   content: string;
   setContent: (value: string) => void;
+  onRefresh?: () => void;
+  isRefreshing?: boolean;
 }
 
 const SORT_OPTIONS = [
@@ -52,6 +54,8 @@ export default function Filters({
   setSortByReaction,
   content,
   setContent,
+  onRefresh,
+  isRefreshing,
 }: FiltersProps) {
   const [localSearch, setLocalSearch] = useState(content);
 
@@ -76,7 +80,8 @@ export default function Filters({
         />
       </div>
 
-      <div className="flex items-center gap-1.5 flex-wrap">
+      <div className="flex items-center gap-1.5 flex-wrap justify-between">
+        <div className="flex items-center gap-1.5 flex-wrap">
         {SORT_OPTIONS.map((opt) => (
           <button
             key={opt.value}
@@ -133,6 +138,18 @@ export default function Filters({
               ))}
             </select>
           </>
+        )}
+        </div>
+
+        {onRefresh && (
+          <button
+            onClick={onRefresh}
+            disabled={isRefreshing}
+            title="Refresh feed"
+            className="p-1.5 rounded-full text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors disabled:opacity-50 cursor-pointer shrink-0"
+          >
+            <RefreshCw size={13} className={isRefreshing ? "animate-spin" : ""} />
+          </button>
         )}
       </div>
     </div>

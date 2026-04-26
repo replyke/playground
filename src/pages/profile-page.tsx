@@ -8,6 +8,8 @@ import {
   SortByReaction,
   TimeFrame,
   useEntityList,
+  useFetchFollowersCountByUserId,
+  useFetchFollowingCountByUserId,
   useFetchUser,
   useFollowManager,
   useUser,
@@ -36,6 +38,8 @@ export default function ProfilePage() {
   const { isFollowing, isLoading, toggleFollow } = useFollowManager({
     userId: userId ?? "",
   });
+  const followersCount = useFetchFollowersCountByUserId({ userId: userId ?? "" });
+  const followingCount = useFetchFollowingCountByUserId({ userId: userId ?? "" });
 
   const {
     entities,
@@ -324,6 +328,18 @@ export default function ProfilePage() {
                           {entities.length}
                         </span>{" "}
                         posts
+                      </span>
+                      <span>
+                        <span className="font-semibold text-neutral-900">
+                          {followersCount ?? "—"}
+                        </span>{" "}
+                        followers
+                      </span>
+                      <span>
+                        <span className="font-semibold text-neutral-900">
+                          {followingCount ?? "—"}
+                        </span>{" "}
+                        following
                       </span>
                       <span>
                         Joined{" "}

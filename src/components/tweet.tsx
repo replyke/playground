@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   useEntity,
   useEntityList,
+  useFollowManager,
   useUser,
   useReactionToggle,
   Entity,
@@ -59,11 +60,13 @@ const formatTimestamp = (timestamp: Date): string => {
 interface TweetProps {
   onAuthRequired: () => void;
   handleSelectEntity: (entity: Entity | null | undefined) => void;
+  listId?: string;
 }
 
 export default function Tweet({
   onAuthRequired,
   handleSelectEntity,
+  listId = "home-tweets",
 }: TweetProps) {
   const { user } = useUser();
   const { entity } = useEntity();
@@ -78,7 +81,10 @@ export default function Tweet({
   );
 
   const isAuthor = user?.id === entity?.user?.id;
-  const { deleteEntity } = useEntityList({ listId: "home-tweets" });
+  const { deleteEntity } = useEntityList({ listId });
+  const { isFollowing, isLoading: isFollowLoading, toggleFollow } = useFollowManager({
+    userId: entity?.user?.id ?? "",
+  });
 
   const [isEntitySaved, setIsEntitySaved] = useState<boolean>(
     entity?.isSaved ?? false,
@@ -206,6 +212,21 @@ export default function Tweet({
             </div>
 
             <div className="flex items-center gap-1">
+              {!isAuthor && user && entity?.user?.id && (
+                <button
+                  onClick={toggleFollow}
+                  disabled={isFollowLoading}
+                  className={
+                    "text-xs px-2.5 py-0.5 rounded-full font-medium border transition-all disabled:opacity-50 cursor-pointer " +
+                    (isFollowing
+                      ? "text-neutral-500 border-neutral-300 hover:border-red-300 hover:text-red-500"
+                      : "text-rose-600 border-rose-200 hover:bg-rose-50")
+                  }
+                >
+                  {isFollowing ? "Following" : "Follow"}
+                </button>
+              )}
+
               {user ? (
                 <ResponsiveDrawer
                   open={isBookmarkDrawerOpen}
