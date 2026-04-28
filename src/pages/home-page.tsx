@@ -19,8 +19,7 @@ import Filters from "../components/filters";
 import { Sheet } from "../components/ui/sheet";
 import CommentSectionSheet from "../components/comment-section-sheet";
 
-const FOR_YOU_LIST_ID = "home-tweets-for-you";
-const FOLLOWING_LIST_ID = "home-tweets-following";
+import { FOR_YOU_LIST_ID, FOLLOWING_LIST_ID } from "../config/list-ids";
 
 export default function TweetFeed() {
   const { user: currentUser } = useUser();
@@ -121,7 +120,10 @@ export default function TweetFeed() {
             onHighlightEnd={() => setHighlightBar(false)}
           />
 
-          <TweetComposer onAuthRequired={handleAuthRequired} />
+          <TweetComposer
+            onAuthRequired={handleAuthRequired}
+            onPost={() => setFeedTab("for-you")}
+          />
 
           {/* Tab bar */}
           <div className="relative flex border-b border-neutral-200">

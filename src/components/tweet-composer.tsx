@@ -2,26 +2,29 @@ import { useState } from "react";
 import { Send } from "lucide-react";
 import { useEntityList, useUser } from "@replyke/react-js";
 import getUserAvatar from "../utils/getUserAvatar";
+import { FOR_YOU_LIST_ID } from "../config/list-ids";
 
 interface TweetComposerProps {
   onAuthRequired: () => void;
+  onPost?: () => void;
 }
 
-export default function TweetComposer({ onAuthRequired }: TweetComposerProps) {
+export default function TweetComposer({ onAuthRequired, onPost }: TweetComposerProps) {
   const { user } = useUser();
-  const { createEntity } = useEntityList({ listId: "home-tweets" });
+  const { createEntity } = useEntityList({ listId: FOR_YOU_LIST_ID });
   const [content, setContent] = useState("");
   const maxLength = 280;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
     if (!user) {
       onAuthRequired();
       return;
     }
     if (content.trim().length > 0 && content.length <= maxLength) {
-      createEntity({ content: content.trim() });
+      await createEntity({ content: content.trim() });
       setContent("");
+      onPost?.();
     }
   };
 
