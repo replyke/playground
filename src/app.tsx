@@ -6,7 +6,9 @@ import HomePage from "./pages/home-page";
 import ProfilePage from "./pages/profile-page";
 import EntityPage from "./pages/entity-page";
 import { useAuth } from "./context/use-auth";
-import DEMO_CREDENTIALS from "./config/credentials";
+
+const PROJECT_ID = import.meta.env.VITE_REPLYKE_PROJECT_ID as string;
+const PRIVATE_KEY = import.meta.env.VITE_REPLYKE_PRIVATE_KEY as string;
 
 function AppInner() {
   const { user } = useAuth();
@@ -18,8 +20,8 @@ function AppInner() {
     if (!user) return;
 
     signTestingJwt({
-      projectId: DEMO_CREDENTIALS.PROJECT_ID,
-      privateKey: DEMO_CREDENTIALS.PRIVATE_KEY,
+      projectId: PROJECT_ID,
+      privateKey: PRIVATE_KEY,
       userData: {
         id: user.username,
         username: user.username,
@@ -29,7 +31,7 @@ function AppInner() {
 
   return (
     <ReplykeProvider
-      projectId={DEMO_CREDENTIALS.PROJECT_ID}
+      projectId={PROJECT_ID}
       signedToken={token}
     >
       <Routes>
