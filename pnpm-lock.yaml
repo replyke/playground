@@ -30,8 +30,8 @@ importers:
         specifier: ^1.2.4
         version: 1.2.4(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@replyke/react-js':
-        specifier: 7.0.1
-        version: 7.0.1(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
+        specifier: 7.0.3
+        version: 7.0.3(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
       '@replyke/ui-core-react-js':
         specifier: ^7.0.0
         version: 7.0.0(moment@2.30.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(styled-components@6.4.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5))
@@ -681,15 +681,15 @@ packages:
       react-redux:
         optional: true
 
-  '@replyke/core@7.0.1':
-    resolution: {integrity: sha512-4zGGB/zS/OMmKja7foHRgH3G5yuefdIgrdiPXhz/NnrDCkFD2yiSrD1Q+gDfXAPJ2JZOjbcEvfN0QwY/fSjZCQ==}
+  '@replyke/core@7.0.3':
+    resolution: {integrity: sha512-JTmCWCroOwaEEBg35X5Vzc8dDWDE2uRFYS6Lc+LhZ0jimzp2lKtrKXKKCnP7Jl7wr5sUOmTxtYVvda03bH9qLg==}
     peerDependencies:
       '@reduxjs/toolkit': ^2.0.0
       react: ^18.0.0 || ^19.0.0
       react-redux: ^9.0.0
 
-  '@replyke/react-js@7.0.1':
-    resolution: {integrity: sha512-t31ZfaL4DBYSYAugQ/MPgbDWw7+lKxnwaeaNuklTr3LQDKyKLHE2b+buo9xEDL5qXQ7MZZ/nzRbUDQiM2I+stQ==}
+  '@replyke/react-js@7.0.3':
+    resolution: {integrity: sha512-RLmcA4pArfx69c4vW0Ma7NGg4PvdpEIvXV8CTGva4q8eLM/UJ/jRi7HVKrKF/IQgtNFFUlajC3ElrvVbmhKWUA==}
     peerDependencies:
       '@reduxjs/toolkit': ^2.0.0
       '@types/react': ^18.0.0 || ^19.0.0
@@ -2481,7 +2481,7 @@ snapshots:
       react: 19.2.5
       react-redux: 9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1)
 
-  '@replyke/core@7.0.1(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)':
+  '@replyke/core@7.0.3(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)':
     dependencies:
       '@reduxjs/toolkit': 2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
       axios: 1.15.1
@@ -2496,10 +2496,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@replyke/react-js@7.0.1(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)':
+  '@replyke/react-js@7.0.3(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)':
     dependencies:
       '@reduxjs/toolkit': 2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
-      '@replyke/core': 7.0.1(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
+      '@replyke/core': 7.0.3(@reduxjs/toolkit@2.11.2(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5))(react-redux@9.2.0(@types/react@19.2.14)(react@19.2.5)(redux@5.0.1))(react@19.2.5)
       '@types/react': 19.2.14
       react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)

@@ -57,11 +57,8 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
   const { entity } = useEntity();
   const { entities, loading: loadingEntities } = useCollectionEntitiesWrapper({});
 
-  // Optimistic override keyed to a specific collection so it auto-clears on navigation
-  const [savedOverride, setSavedOverride] = useState<{ collectionId: string; saved: boolean } | null>(null);
-  const derivedSaved = entities.some((e) => e.id === entity?.id);
-  const isSavedInCurrent =
-    savedOverride?.collectionId === currentCollection?.id ? savedOverride.saved : derivedSaved;
+  // Derived directly from the optimistic Redux entity list — no local override needed
+  const isSavedInCurrent = entities.some((e) => e.id === entity?.id);
 
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
@@ -74,7 +71,6 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
 
   const handleCreateCollection = async () => {
     if (!newCollectionName.trim()) return;
-
     setIsCreatingCollection(true);
     try {
       await createCollection({ collectionName: newCollectionName.trim() });
@@ -86,11 +82,11 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
     }
   };
 
-  const handleAddToCollection = async (entityId: string) => {
+  const handleAddToCollection = async () => {
+    if (!entity) return;
+    setIsSaving(true);
     try {
-      setIsSaving(true);
-      await addToCollection({ entityId });
-      if (currentCollection) setSavedOverride({ collectionId: currentCollection.id, saved: true });
+      await addToCollection({ entity });
       setIsEntitySaved(true);
     } catch (error) {
       console.error("Failed to add to collection:", error);
@@ -102,26 +98,10 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
   const handleRemoveFromCollection = async (entityId: string) => {
     try {
       await removeFromCollection({ entityId });
-      if (currentCollection) setSavedOverride({ collectionId: currentCollection.id, saved: false });
-      setIsEntitySaved(false);
-    } catch (error) {
-      console.error("Failed to remove from collection:", error);
-    }
-  };
-
-  const handleRemoveOtherEntity = async (entityId: string) => {
-    try {
-      setRemoving(true);
-      await removeFromCollection({ entityId });
+      if (entityId === entity?.id) setIsEntitySaved(false);
       setConfirmingRemoveId(null);
-      if (entityId === entity?.id && currentCollection) {
-        setSavedOverride({ collectionId: currentCollection.id, saved: false });
-        setIsEntitySaved(false);
-      }
     } catch (error) {
       console.error("Failed to remove from collection:", error);
-    } finally {
-      setRemoving(false);
     }
   };
 
@@ -132,7 +112,6 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
 
   const handleSaveEdit = async (collectionId: string) => {
     if (!editName.trim()) return;
-
     try {
       await updateCollection({ collectionId, update: { name: editName.trim() } });
       setEditingCollection(null);
@@ -170,15 +149,9 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
       {currentCollection && entity?.id && (
         <div className="pb-3 border-b">
           <Button
-            onClick={async () => {
-              if (isSavedInCurrent) {
-                handleRemoveFromCollection(entity.id);
-              } else {
-                handleAddToCollection(entity.id);
-              }
-            }}
-            variant={isSavedInCurrent ? "default" : "outline"}
-            disabled={isSaving || loadingEntities}
+            onClick={handleAddToCollection}
+            variant="outline"
+            disabled={isSavedInCurrent || isSaving || loadingEntities}
             className="w-full cursor-pointer"
           >
             {isSaving || loadingEntities ? (
@@ -189,7 +162,7 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
             ) : isSavedInCurrent ? (
               <>
                 <Check size={16} className="mr-2" />
-                Remove from {currentCollection.name}
+                Saved to {currentCollection.name}
               </>
             ) : (
               <>
@@ -339,7 +312,11 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
                               Cancel
                             </button>
                             <button
-                              onClick={() => handleRemoveOtherEntity(savedEntity.id)}
+                              onClick={async () => {
+                                setRemoving(true);
+                                await handleRemoveFromCollection(savedEntity.id);
+                                setRemoving(false);
+                              }}
                               className="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded transition-colors disabled:opacity-50"
                               disabled={removing}
                             >
