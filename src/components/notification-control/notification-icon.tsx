@@ -93,8 +93,7 @@ interface NotificationIconProps {
 
 function NotificationIcon({ type, style = {}, isDarkTheme }: NotificationIconProps) {
   const iconConfig = getIconConfig(isDarkTheme);
-  const config = iconConfig[type];
-  const { Icon, color, backgroundColor } = config;
+  const { Icon, color, backgroundColor } = iconConfig[type] ?? iconConfig["system"];
 
   return (
     <div
