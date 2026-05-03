@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useEntity, useCollections } from "@replyke/react-js";
+import { Link } from "react-router-dom";
+import { useEntity, useCollections, useCollectionEntitiesWrapper } from "@replyke/react-js";
 import type { Collection } from "@replyke/react-js";
 import {
   Plus,
@@ -10,6 +11,7 @@ import {
   Edit,
   Trash2,
   LoaderCircle,
+  ExternalLink,
 } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -24,6 +26,21 @@ interface CollectionsDialogProps {
   setIsEntitySaved: (saved: boolean) => void;
 }
 
+function EntitySkeleton() {
+  return (
+    <div className="flex items-start space-x-2 p-2 rounded-md border animate-pulse">
+      <div className="flex-1 min-w-0 space-y-2">
+        <div className="h-3 bg-gray-200 rounded w-3/4" />
+        <div className="h-3 bg-gray-200 rounded w-1/2" />
+        <div className="flex items-center space-x-3">
+          <div className="h-2.5 bg-gray-200 rounded w-8" />
+          <div className="h-2.5 bg-gray-200 rounded w-16" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
   const {
     createCollection,
@@ -33,12 +50,18 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
     openCollection,
     goBack,
     currentCollection,
-    isEntitySaved,
     addToCollection,
     removeFromCollection,
   } = useCollections();
 
   const { entity } = useEntity();
+  const { entities, loading: loadingEntities } = useCollectionEntitiesWrapper({});
+
+  // Optimistic override keyed to a specific collection so it auto-clears on navigation
+  const [savedOverride, setSavedOverride] = useState<{ collectionId: string; saved: boolean } | null>(null);
+  const derivedSaved = entities.some((e) => e.id === entity?.id);
+  const isSavedInCurrent =
+    savedOverride?.collectionId === currentCollection?.id ? savedOverride.saved : derivedSaved;
 
   const [isCreatingCollection, setIsCreatingCollection] = useState(false);
   const [newCollectionName, setNewCollectionName] = useState("");
@@ -46,6 +69,8 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
   const [editName, setEditName] = useState("");
   const [deleteConfirm, setDeleteConfirm] = useState<Collection | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [confirmingRemoveId, setConfirmingRemoveId] = useState<string | null>(null);
+  const [removing, setRemoving] = useState(false);
 
   const handleCreateCollection = async () => {
     if (!newCollectionName.trim()) return;
@@ -65,6 +90,7 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
     try {
       setIsSaving(true);
       await addToCollection({ entityId });
+      if (currentCollection) setSavedOverride({ collectionId: currentCollection.id, saved: true });
       setIsEntitySaved(true);
     } catch (error) {
       console.error("Failed to add to collection:", error);
@@ -76,8 +102,26 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
   const handleRemoveFromCollection = async (entityId: string) => {
     try {
       await removeFromCollection({ entityId });
+      if (currentCollection) setSavedOverride({ collectionId: currentCollection.id, saved: false });
+      setIsEntitySaved(false);
     } catch (error) {
       console.error("Failed to remove from collection:", error);
+    }
+  };
+
+  const handleRemoveOtherEntity = async (entityId: string) => {
+    try {
+      setRemoving(true);
+      await removeFromCollection({ entityId });
+      setConfirmingRemoveId(null);
+      if (entityId === entity?.id && currentCollection) {
+        setSavedOverride({ collectionId: currentCollection.id, saved: false });
+        setIsEntitySaved(false);
+      }
+    } catch (error) {
+      console.error("Failed to remove from collection:", error);
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -127,21 +171,25 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
         <div className="pb-3 border-b">
           <Button
             onClick={async () => {
-              const result = await isEntitySaved({ entityId: entity.id });
-              if (result.inSpecificCollection) {
+              if (isSavedInCurrent) {
                 handleRemoveFromCollection(entity.id);
               } else {
                 handleAddToCollection(entity.id);
               }
             }}
-            variant="outline"
-            disabled={isSaving}
-            className="w-full"
+            variant={isSavedInCurrent ? "default" : "outline"}
+            disabled={isSaving || loadingEntities}
+            className="w-full cursor-pointer"
           >
-            {isSaving ? (
+            {isSaving || loadingEntities ? (
               <>
                 <LoaderCircle size={16} className="mr-2 animate-spin" />
-                Saving..
+                {isSaving ? "Saving..." : "Loading..."}
+              </>
+            ) : isSavedInCurrent ? (
+              <>
+                <Check size={16} className="mr-2" />
+                Remove from {currentCollection.name}
               </>
             ) : (
               <>
@@ -236,6 +284,89 @@ function CollectionsDialog({ setIsEntitySaved }: CollectionsDialogProps) {
           </div>
         )}
       </div>
+
+      {currentCollection && (
+        <div className="space-y-2 pt-2 border-t">
+          {loadingEntities ? (
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              <EntitySkeleton />
+              <EntitySkeleton />
+            </div>
+          ) : entities.length > 0 ? (
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {entities.map((savedEntity) => {
+                const isCurrentEntity = savedEntity.id === entity?.id;
+                const isConfirming = confirmingRemoveId === savedEntity.id;
+                return (
+                  <div
+                    key={savedEntity.id}
+                    className={
+                      "flex items-start space-x-2 p-2 rounded-md border transition-colors " +
+                      (isCurrentEntity ? "border-blue-200 bg-blue-50" : "hover:bg-gray-50")
+                    }
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-900 truncate">
+                            {savedEntity.content && savedEntity.content.length > 80
+                              ? savedEntity.content.substring(0, 80) + "..."
+                              : savedEntity.content}
+                          </p>
+                          <div className="flex items-center space-x-3 mt-1">
+                            <Link
+                              to={"/e/" + savedEntity.shortId}
+                              className="text-xs text-blue-600 hover:text-blue-800 flex items-center space-x-1"
+                            >
+                              <ExternalLink size={10} />
+                              <span>View</span>
+                            </Link>
+                            {savedEntity.createdAt && (
+                              <span className="text-xs text-gray-400">
+                                {new Date(savedEntity.createdAt).toLocaleDateString()}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {isConfirming ? (
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => setConfirmingRemoveId(null)}
+                              className="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100 transition-colors"
+                              disabled={removing}
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleRemoveOtherEntity(savedEntity.id)}
+                              className="text-xs text-white bg-red-500 hover:bg-red-600 px-2 py-1 rounded transition-colors disabled:opacity-50"
+                              disabled={removing}
+                            >
+                              {removing ? "..." : "Remove"}
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmingRemoveId(savedEntity.id)}
+                            className="h-6 w-6 flex items-center justify-center text-gray-400 hover:text-red-500 rounded transition-colors shrink-0"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-3 text-gray-400 text-xs">
+              No items in this collection
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="pt-4 border-t flex items-center gap-2">
         <Input
