@@ -2,7 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { LogOut, FolderOpen, Shuffle, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth as useAuthReplyke, useUser } from "@replyke/react-js";
+import { useAuth as useAuthSublay, useUser } from "@sublay/react-js";
 import { useAuth } from "../context/use-auth";
 import getUserAvatar from "../utils/getUserAvatar";
 import { ResponsiveDrawer } from "./ui/ResponsiveDrawer";
@@ -52,7 +52,7 @@ const notificationTemplates = {
 export default function UserBar({ highlighted, onHighlightEnd }: UserBarProps) {
   const { user } = useUser();
   const { clearUsername, setUsername: saveUsername, generateRandomUsername } = useAuth();
-  const { signOut: signOutReplyke } = useAuthReplyke();
+  const { signOut: signOutSublay } = useAuthSublay();
 
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
@@ -104,7 +104,7 @@ export default function UserBar({ highlighted, onHighlightEnd }: UserBarProps) {
 
   const handleSignOut = async () => {
     clearUsername();
-    await signOutReplyke();
+    await signOutSublay();
   };
 
   return (
@@ -170,7 +170,7 @@ export default function UserBar({ highlighted, onHighlightEnd }: UserBarProps) {
                 />
 
                 <a
-                  href="https://github.com/replyke/playground"
+                  href="https://github.com/sublay-io/playground"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-neutral-400 hover:text-neutral-700 transition-colors p-1.5 rounded-lg hover:bg-neutral-100"
@@ -247,7 +247,7 @@ export default function UserBar({ highlighted, onHighlightEnd }: UserBarProps) {
               </form>
 
               <a
-                href="https://github.com/replyke/playground"
+                href="https://github.com/sublay-io/playground"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-neutral-400 hover:text-neutral-700 transition-colors p-1.5 rounded-lg hover:bg-neutral-100 shrink-0"

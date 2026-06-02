@@ -13,7 +13,7 @@ import {
   useFetchUser,
   useFollowManager,
   useUser,
-} from "@replyke/react-js";
+} from "@sublay/react-js";
 import { ArrowLeft, Edit2, Check, X, Calendar, UserIcon } from "lucide-react";
 import Tweet from "../components/tweet";
 import LoadingPlaceholder from "../components/loading-placeholder";

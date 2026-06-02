@@ -5,7 +5,7 @@ import {
   ReportReasonKey,
   useUser,
   useCreateReport,
-} from "@replyke/react-js";
+} from "@sublay/react-js";
 import { FlagIcon, LoaderCircleIcon } from "lucide-react";
 import {
   DialogContent,

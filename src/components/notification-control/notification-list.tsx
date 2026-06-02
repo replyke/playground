@@ -1,6 +1,6 @@
 import { Loader2, Bell } from "lucide-react";
 import { motion } from "framer-motion";
-import { AppNotification } from "@replyke/react-js";
+import { AppNotification } from "@sublay/react-js";
 type PotentiallyPopulatedUnifiedAppNotification = AppNotification.PotentiallyPopulatedUnifiedAppNotification;
 import NotificationItem from "./notification-item";
 

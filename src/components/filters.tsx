@@ -4,7 +4,7 @@ import {
   EntityListSortByOptions,
   SortByReaction,
   TimeFrame,
-} from "@replyke/react-js";
+} from "@sublay/react-js";
 
 interface FiltersProps {
   sortBy: EntityListSortByOptions;

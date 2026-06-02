@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Entity, useUser } from "@replyke/react-js";
+import { Entity, useUser } from "@sublay/react-js";
 import {
   Sheet,
   SheetContent,

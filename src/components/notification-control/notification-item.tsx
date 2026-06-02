@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { formatRelativeTime, truncateText } from "./utils";
 import NotificationIcon from "./notification-icon";
-import { AppNotification } from "@replyke/react-js";
+import { AppNotification } from "@sublay/react-js";
 type PotentiallyPopulatedUnifiedAppNotification = AppNotification.PotentiallyPopulatedUnifiedAppNotification;
 
 const getColors = (isDark = false) => ({

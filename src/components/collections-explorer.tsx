@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useCollections, useCollectionEntitiesWrapper } from "@replyke/react-js";
-import type { Entity } from "@replyke/react-js";
+import { useCollections, useCollectionEntitiesWrapper } from "@sublay/react-js";
+import type { Entity } from "@sublay/react-js";
 import {
   ArrowLeft,
   ChevronRight,

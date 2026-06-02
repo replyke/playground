@@ -9,7 +9,7 @@ import {
   TimeFrame,
   useEntityList,
   useUser,
-} from "@replyke/react-js";
+} from "@sublay/react-js";
 import { useInfiniteScroll } from "../hooks/use-infinite-scroll";
 import Tweet from "../components/tweet";
 import TweetComposer from "../components/tweet-composer";

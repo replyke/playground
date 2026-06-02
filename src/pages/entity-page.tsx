@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
-import { Entity, EntityProvider, useFetchEntityByShortId } from "@replyke/react-js";
+import { Entity, EntityProvider, useFetchEntityByShortId } from "@sublay/react-js";
 import Tweet from "../components/tweet";
 import LoadingPlaceholder from "../components/loading-placeholder";
 import CommentSectionSheet from "../components/comment-section-sheet";

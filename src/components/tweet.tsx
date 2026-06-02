@@ -7,7 +7,7 @@ import {
   useUser,
   useReactionToggle,
   Entity,
-} from "@replyke/react-js";
+} from "@sublay/react-js";
 import {
   MessageCircle,
   MoreHorizontal,

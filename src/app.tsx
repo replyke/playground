@@ -1,4 +1,4 @@
-import { ReplykeProvider, useSignTestingJwt } from "@replyke/react-js";
+import { SublayProvider, useSignTestingJwt } from "@sublay/react-js";
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/auth-provider";
@@ -7,8 +7,8 @@ import ProfilePage from "./pages/profile-page";
 import EntityPage from "./pages/entity-page";
 import { useAuth } from "./context/use-auth";
 
-const PROJECT_ID = import.meta.env.VITE_REPLYKE_PROJECT_ID as string;
-const PRIVATE_KEY = import.meta.env.VITE_REPLYKE_PRIVATE_KEY as string;
+const PROJECT_ID = import.meta.env.VITE_SUBLAY_PROJECT_ID as string;
+const PRIVATE_KEY = import.meta.env.VITE_SUBLAY_PRIVATE_KEY as string;
 
 function AppInner() {
   const { user } = useAuth();
@@ -30,7 +30,7 @@ function AppInner() {
   }, [user]);
 
   return (
-    <ReplykeProvider
+    <SublayProvider
       projectId={PROJECT_ID}
       signedToken={token}
     >
@@ -39,7 +39,7 @@ function AppInner() {
         <Route path="/u/:userId" element={<ProfilePage />} />
         <Route path="/e/:shortId" element={<EntityPage />} />
       </Routes>
-    </ReplykeProvider>
+    </SublayProvider>
   );
 }
 

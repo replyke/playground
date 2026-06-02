@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
-import { useEntityList, useUser } from "@replyke/react-js";
+import { useEntityList, useUser } from "@sublay/react-js";
 import getUserAvatar from "../utils/getUserAvatar";
 import { FOR_YOU_LIST_ID } from "../config/list-ids";
 

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAppNotifications, AppNotification } from "@replyke/react-js";
+import { useAppNotifications, AppNotification } from "@sublay/react-js";
 import { CheckCheck } from "lucide-react";
 type NotificationTemplates = AppNotification.NotificationTemplates;
 type PotentiallyPopulatedUnifiedAppNotification = AppNotification.PotentiallyPopulatedUnifiedAppNotification;

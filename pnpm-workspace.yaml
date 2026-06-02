@@ -1,0 +1,4 @@
+minimumReleaseAgeExclude:
+  - '@sublay/core@7.0.3'
+  - '@sublay/react-js@7.0.3'
+  - '@sublay/ui-core-react-js@7.0.0'

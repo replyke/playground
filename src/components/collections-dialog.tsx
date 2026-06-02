@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useEntity, useCollections, useCollectionEntitiesWrapper } from "@replyke/react-js";
-import type { Collection } from "@replyke/react-js";
+import { useEntity, useCollections, useCollectionEntitiesWrapper } from "@sublay/react-js";
+import type { Collection } from "@sublay/react-js";
 import {
   Plus,
   Check,
